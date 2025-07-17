@@ -356,6 +356,79 @@
     }
 })();
 </script>
+<script>
+// Add disclaimer to chatbot messages
+(function() {
+    // The disclaimer text to add
+    const DISCLAIMER_TEXT = " - This chatbot is powered by AI. It's here to help, but it might not always get things right. For anything important, double-check with our team.";
+    
+    // Function to add disclaimer to timestamp
+    function addDisclaimer(timestampElement) {
+        // Check if disclaimer already added
+        if (!timestampElement.textContent.includes(DISCLAIMER_TEXT)) {
+            timestampElement.textContent += DISCLAIMER_TEXT;
+        }
+    }
+    
+    // Function to process all messages
+    function processAllMessages() {
+        // Find all timestamp divs that belong to assistant messages
+        // They have text-left class and contain time pattern
+        const allTimestamps = document.querySelectorAll('.allm-font-sans.allm-text-\\[10px\\].allm-text-gray-400.allm-text-left');
+        
+        allTimestamps.forEach(timestamp => {
+            // Check if this is a valid timestamp
+            if (timestamp.textContent.match(/^\d{1,2}:\d{2}\s*(AM|PM)$/)) {
+                // Check if there's an assistant message above this timestamp
+                const parentBlock = timestamp.closest('.allm-py-\\[5px\\]');
+                if (parentBlock && parentBlock.querySelector('.allm-anything-llm-assistant-message')) {
+                    addDisclaimer(timestamp);
+                }
+            }
+        });
+    }
+    
+    // Set up MutationObserver to watch for new messages
+    const observer = new MutationObserver((mutations) => {
+        // Process all messages whenever DOM changes
+        processAllMessages();
+    });
+    
+    // Start observing when chat widget loads
+    function startObserving() {
+        // Look for the chat history container
+        const chatHistory = document.getElementById('chat-history');
+        const chatContainer = document.getElementById('anything-llm-chat');
+        const embedContainer = document.getElementById('anything-llm-embed-chat-container');
+        
+        const targetElement = chatHistory || chatContainer || embedContainer;
+        
+        if (targetElement) {
+            observer.observe(targetElement, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+            // Process any existing messages
+            processAllMessages();
+            console.log('Watson disclaimer script started monitoring chat messages');
+        } else {
+            // Try again if chat container not found
+            setTimeout(startObserving, 500);
+        }
+    }
+    
+    // Also run periodically as a fallback
+    setInterval(processAllMessages, 1000);
+    
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startObserving);
+    } else {
+        startObserving();
+    }
+})();
+</script>
 </body>
 <!-- END CHAT BOT CODE -->
 </html>
