@@ -46,7 +46,14 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Timestamp-based disclaimer placement
 - Prevents duplicate disclaimers
 
-### 4. **Cookie Management**
+### 4. **Form-Based Initial Interaction**
+- Custom intake form for first-time visitors
+- Collects: First Name, Last Name, Email, Phone, Company, Message
+- Automatically formats and sends data to chatbot
+- Session-based tracking to show form only once
+- Smooth transition to regular chat after submission
+
+### 5. **Cookie Management**
 - Optional cookie tracking to limit popup frequency
 - Configurable cookie duration
 - Session-based popup limits
@@ -131,6 +138,7 @@ const popupMessages = [
 - Chat popup positioning and animations
 - Z-index management for proper layering
 - Responsive design considerations
+- Form input styling and focus states
 
 ### 2. **Popup Functionality Script**
 - **Cookie Management**: `setCookie()`, `getCookie()`
@@ -143,6 +151,13 @@ const popupMessages = [
 - **Disclaimer Addition**: `addDisclaimer()`
 - **DOM Monitoring**: MutationObserver setup
 - **Fallback Timer**: 1-second interval check
+
+### 4. **Form Interaction Script**
+- **Form Creation**: `createIntakeForm()` generates the HTML form
+- **Form Display**: `showIntakeForm()` manages form visibility
+- **Form Submission**: `handleFormSubmit()` processes and formats data
+- **Message Formatting**: Sends data as `\\\|First Name:VALUE|Last Name:VALUE|Email:VALUE|Phone:VALUE|Company:VALUE|Message:VALUE|\\\`
+- **Session Management**: Uses sessionStorage to track form submission
 
 ## Customization
 
@@ -174,6 +189,21 @@ transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 Update the `DISCLAIMER_TEXT` constant:
 ```javascript
 const DISCLAIMER_TEXT = " - Your custom disclaimer here.";
+```
+
+### Customizing the Intake Form
+
+The form fields can be modified in the `createIntakeForm()` function:
+
+```javascript
+// Add or remove fields as needed
+<input type="text" id="custom-field" name="customField" placeholder="Custom Field"
+    class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+```
+
+Update the message format in `handleFormSubmit()`:
+```javascript
+const formattedMessage = `\\\\\\|First Name:${firstName}|Last Name:${lastName}|Email:${email}|Phone:${phone}|Company:${company}|Custom Field:${customField}|Message:${message}|\\\\\\`;
 ```
 
 ## API Reference
@@ -228,6 +258,20 @@ The addon listens for:
    - Set `USE_COOKIE_LIMIT: true` in CONFIG
    - Check browser cookie settings
    - Verify cookie name: `watson_chat_popup_shown`
+
+4. **Intake form not appearing**
+   - Clear sessionStorage: `sessionStorage.removeItem('watson_form_submitted')`
+   - Or clear all Watson-related storage: `sessionStorage.clear()`
+   - Verify chat widget is fully loaded
+   - Check for JavaScript errors in console
+   - Ensure greeting text element exists with correct classes
+   - The form automatically reappears when clicking "Reset Chat" in the widget
+
+5. **Form submission not working**
+   - Check if message input (`#message-input`) exists
+   - Verify send button (`#send-message-button`) is present
+   - Check console for JavaScript errors
+   - Ensure form validation passes (required fields)
 
 ### Debug Mode
 

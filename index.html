@@ -429,6 +429,495 @@
     }
 })();
 </script>
+<script>
+// Form-based initial interaction for Watson Creative chatbot
+(function() {
+    let formSubmitted = false;
+    let chatInitialized = false;
+
+    // Function to create the intake form
+    function createIntakeForm() {
+        const formHTML = `
+            <div id="watson-intake-form" class="allm-px-4 allm-py-4 allm-w-full">
+                <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
+                    <div class="allm-flex allm-gap-x-2">
+                        <input type="text" id="first-name" name="firstName" placeholder="First Name" required
+                            class="allm-flex-1 allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                        <input type="text" id="last-name" name="lastName" placeholder="Last Name" required
+                            class="allm-flex-1 allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                    </div>
+                    <input type="email" id="email" name="email" placeholder="Email" required
+                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                    <input type="tel" id="phone" name="phone" placeholder="Phone"
+                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                    <input type="text" id="company" name="company" placeholder="Company"
+                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                    <textarea id="message" name="message" placeholder="Tell us about your project..." required
+                        rows="3"
+                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795] allm-resize-none"></textarea>
+                    <button type="submit" 
+                        class="allm-w-full allm-py-2 allm-px-4 allm-bg-[#00b795] allm-text-white allm-rounded-lg allm-font-medium allm-text-sm hover:allm-bg-[#00a084] allm-transition-colors">
+                        Start Conversation
+                    </button>
+                </form>
+            </div>
+        `;
+        return formHTML;
+    }
+
+    // Function to hide the message input area and show the form
+    function showIntakeForm() {
+        // Find the chat container
+        const chatContainer = document.getElementById('anything-llm-chat');
+        if (!chatContainer || formSubmitted) return;
+
+        console.log('Watson Chat: Showing intake form');
+
+        // Hide the original message input form
+        const originalForm = chatContainer.querySelector('form');
+        if (originalForm) {
+            originalForm.style.display = 'none';
+            console.log('Watson Chat: Original form hidden');
+        }
+
+        // Check if form already exists
+        let intakeForm = document.getElementById('watson-intake-form');
+        
+        if (!intakeForm) {
+            // Find the greeting text container
+            const greetingContainer = chatContainer.querySelector('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center')?.parentElement?.parentElement;
+            
+            if (greetingContainer) {
+                // Insert the form after the greeting
+                const formDiv = document.createElement('div');
+                formDiv.innerHTML = createIntakeForm();
+                greetingContainer.appendChild(formDiv.firstElementChild);
+                intakeForm = document.getElementById('watson-intake-form');
+                console.log('Watson Chat: Intake form created');
+            }
+        }
+        
+        // Show the intake form
+        if (intakeForm) {
+            intakeForm.style.display = 'block';
+            console.log('Watson Chat: Intake form container displayed');
+            
+            // Make sure the actual form is visible too
+            const form = document.getElementById('watson-contact-form');
+            if (form) {
+                form.style.display = '';
+                console.log('Watson Chat: Form element made visible');
+                
+                // Add form submission handler if not already added
+                if (!form.hasAttribute('data-listener-added')) {
+                    form.addEventListener('submit', handleFormSubmit, false);
+                    form.setAttribute('data-listener-added', 'true');
+                    console.log('Watson Chat: Form submission handler added');
+                    
+                    // Also add click handler to the submit button as backup
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleFormSubmit(e);
+                        }, false);
+                        console.log('Watson Chat: Button click handler added');
+                    }
+                }
+            }
+        }
+    }
+
+    // Function to handle form submission
+    function handleFormSubmit(e) {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        console.log('Watson Chat: Form submitted');
+        
+        // Get the form element
+        const form = document.getElementById('watson-contact-form');
+        if (!form) {
+            console.error('Watson Chat: Form not found');
+            return false;
+        }
+        
+        const formData = new FormData(form);
+        const firstName = formData.get('firstName') || '';
+        const lastName = formData.get('lastName') || '';
+        const email = formData.get('email') || '';
+        const phone = formData.get('phone') || '';
+        const company = formData.get('company') || '';
+        const message = formData.get('message') || '';
+
+        console.log('Watson Chat: Form data collected:', {
+            firstName, lastName, email, phone, company, message
+        });
+
+        // Format the message according to the specified format
+        const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<message>${message}</message>`;
+        console.log('Watson Chat: Formatted message:', formattedMessage);
+
+        // First, show the original message input (it needs to be visible to work)
+        const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
+        if (originalForm) {
+            originalForm.style.display = '';
+            console.log('Watson Chat: Original form shown');
+        }
+
+        // Hide the intake form
+        const intakeForm = document.getElementById('watson-intake-form');
+        if (intakeForm) {
+            intakeForm.style.display = 'none';
+            console.log('Watson Chat: Intake form hidden');
+        }
+
+        // Send the message with a slight delay to ensure DOM is ready
+        setTimeout(() => {
+            console.log('Watson Chat: Waiting for message input to be available');
+            let attempts = 0;
+            
+            // Wait for the input to be available
+            const waitForInput = setInterval(() => {
+                attempts++;
+                const messageInput = document.getElementById('message-input');
+                const sendButton = document.getElementById('send-message-button');
+                
+                console.log(`Watson Chat: Attempt ${attempts} - Input found: ${!!messageInput}, Button found: ${!!sendButton}, Input visible: ${messageInput ? messageInput.offsetParent !== null : false}`);
+                
+                if (messageInput && sendButton && messageInput.offsetParent !== null) {
+                    clearInterval(waitForInput);
+                    console.log('Watson Chat: Input and button are ready, sending message');
+                    sendFormattedMessage(formattedMessage);
+                    
+                    // Mark form as submitted after sending
+                    formSubmitted = true;
+                    
+                    // Store form submission state
+                    sessionStorage.setItem('watson_form_submitted', 'true');
+                }
+            }, 100);
+            
+            // Timeout after 5 seconds
+            setTimeout(() => {
+                clearInterval(waitForInput);
+                console.error('Watson Chat: Timeout waiting for message input');
+            }, 5000);
+        }, 200);
+        
+        // Prevent default form submission
+        return false;
+    }
+
+    // Function to send the formatted message
+    function sendFormattedMessage(message) {
+        console.log('Watson Chat: Attempting to send message:', message);
+        
+        // Find the message input and send button
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-message-button');
+
+        console.log('Watson Chat: Message input found:', !!messageInput);
+        console.log('Watson Chat: Send button found:', !!sendButton);
+
+        if (messageInput && sendButton) {
+            // Focus the input first
+            messageInput.focus();
+            
+            // For React controlled components, we need to simulate native input
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+            nativeInputValueSetter.call(messageInput, message);
+            
+            // Create and dispatch input event for React
+            const inputEvent = new Event('input', { bubbles: true });
+            messageInput.dispatchEvent(inputEvent);
+            
+            console.log('Watson Chat: Message set in input:', messageInput.value);
+            
+            // Try multiple approaches to submit
+            setTimeout(() => {
+                // Method 1: Submit the form directly
+                const form = messageInput.closest('form');
+                if (form) {
+                    console.log('Watson Chat: Submitting form directly');
+                    // Create and dispatch a submit event
+                    const submitEvent = new Event('submit', { 
+                        bubbles: true, 
+                        cancelable: true 
+                    });
+                    
+                    // Prevent default to let React handle it
+                    form.addEventListener('submit', function(e) {
+                        console.log('Watson Chat: Form submit event triggered');
+                    }, { once: true });
+                    
+                    form.dispatchEvent(submitEvent);
+                }
+                
+                // Method 2: Click the button with proper event
+                setTimeout(() => {
+                    if (messageInput.value === message) {
+                        console.log('Watson Chat: Trying button click');
+                        const clickEvent = new MouseEvent('click', {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        sendButton.dispatchEvent(clickEvent);
+                    }
+                }, 100);
+                
+                // Method 3: Trigger Enter key press
+                setTimeout(() => {
+                    if (messageInput.value === message) {
+                        console.log('Watson Chat: Trying Enter key press');
+                        const enterEvent = new KeyboardEvent('keydown', {
+                            key: 'Enter',
+                            code: 'Enter',
+                            keyCode: 13,
+                            which: 13,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        messageInput.dispatchEvent(enterEvent);
+                        
+                        // Also try keypress
+                        const keypressEvent = new KeyboardEvent('keypress', {
+                            key: 'Enter',
+                            code: 'Enter',
+                            keyCode: 13,
+                            which: 13,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        messageInput.dispatchEvent(keypressEvent);
+                    }
+                }, 200);
+                
+                // Check if message was sent after all attempts
+                setTimeout(() => {
+                    if (messageInput.value === '') {
+                        console.log('Watson Chat: Message sent successfully');
+                    } else {
+                        console.log('Watson Chat: Message may not have been sent, value still in input');
+                    }
+                }, 500);
+            }, 100);
+        } else {
+            console.error('Watson Chat: Could not find message input or send button');
+        }
+    }
+
+    // Function to check if form was already submitted this session
+    function checkFormStatus() {
+        return sessionStorage.getItem('watson_form_submitted') === 'true';
+    }
+
+    // Initialize the form when chat opens
+    function initializeFormInteraction() {
+        // Prevent duplicate initialization
+        if (chatInitialized) {
+            console.log('Watson Chat: Already initialized, skipping');
+            return;
+        }
+        
+        console.log('Watson Chat: Initializing form interaction');
+        chatInitialized = true;
+        
+        // Always check current form status
+        formSubmitted = checkFormStatus();
+        console.log('Watson Chat: Form submitted status:', formSubmitted);
+        
+        // Show form if not submitted
+        if (!formSubmitted) {
+            // Wait a bit for the chat to fully render
+            setTimeout(() => {
+                showIntakeForm();
+                
+                // Also ensure the original form is hidden
+                const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
+                if (originalForm) {
+                    originalForm.style.display = 'none';
+                }
+            }, 500);
+        } else {
+            // If form was submitted, ensure regular chat input is visible
+            const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
+            if (originalForm) {
+                originalForm.style.display = '';
+            }
+        }
+    }
+
+    // Watch for chat window to open
+    function watchForChatOpen() {
+        console.log('Watson Chat: Starting to watch for chat window');
+        
+        const observer = new MutationObserver((mutations) => {
+            // Check if chat window is visible
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow) {
+                // Check if it's visible (not display: none and has dimensions)
+                const isVisible = chatWindow.offsetParent !== null || 
+                                window.getComputedStyle(chatWindow).display !== 'none';
+                
+                if (isVisible && !chatInitialized) {
+                    console.log('Watson Chat: Chat window detected as open');
+                    initializeFormInteraction();
+                }
+            }
+        });
+
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+
+        // Also check if chat is already open
+        setTimeout(() => {
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow) {
+                const isVisible = chatWindow.offsetParent !== null || 
+                                window.getComputedStyle(chatWindow).display !== 'none';
+                if (isVisible) {
+                    console.log('Watson Chat: Chat window already open');
+                    initializeFormInteraction();
+                }
+            }
+        }, 1000);
+    }
+
+    // Start watching when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', watchForChatOpen);
+    } else {
+        watchForChatOpen();
+    }
+
+    // Watch for reset button clicks
+    function watchForResetButton() {
+        const observer = new MutationObserver((mutations) => {
+            // Look for the reset button - it has specific classes and text
+            const buttons = document.querySelectorAll('button.allm-h-fit.allm-px-0.hover\\:allm-cursor-pointer.allm-border-none.allm-text-sm.allm-bg-transparent');
+            buttons.forEach(button => {
+                if (button.textContent.trim() === 'Reset Chat') {
+                    // Remove existing listener to avoid duplicates
+                    button.removeEventListener('click', handleResetClick);
+                    // Add click listener
+                    button.addEventListener('click', handleResetClick);
+                }
+            });
+        });
+
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Also check immediately in case button already exists
+        const buttons = document.querySelectorAll('button.allm-h-fit.allm-px-0.hover\\:allm-cursor-pointer.allm-border-none.allm-text-sm.allm-bg-transparent');
+        buttons.forEach(button => {
+            if (button.textContent.trim() === 'Reset Chat') {
+                button.addEventListener('click', handleResetClick);
+            }
+        });
+    }
+
+    // Handle reset button click
+    function handleResetClick() {
+        console.log('Watson Chat: Reset button clicked, clearing form state');
+        // Clear the form submission state
+        sessionStorage.removeItem('watson_form_submitted');
+        // Reset our flags
+        formSubmitted = false;
+        chatInitialized = false;
+        
+        // Wait a bit for the chat to reset, then re-initialize
+        setTimeout(() => {
+            // Check if chat is open and re-initialize
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                initializeFormInteraction();
+            }
+        }, 500);
+    }
+
+    // Start watching for reset button
+    watchForResetButton();
+
+    // Expose functions for debugging
+    window.watsonChatDebug = {
+        showForm: showIntakeForm,
+        resetForm: () => {
+            sessionStorage.removeItem('watson_form_submitted');
+            formSubmitted = false;
+            chatInitialized = false;
+            console.log('Watson Chat: Form state reset');
+            showIntakeForm();
+        },
+        checkStatus: () => {
+            const intakeForm = document.getElementById('watson-intake-form');
+            const contactForm = document.getElementById('watson-contact-form');
+            const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
+            
+            console.log('Watson Chat Status:', {
+                formSubmitted,
+                chatInitialized,
+                sessionStorage: sessionStorage.getItem('watson_form_submitted'),
+                intakeFormExists: !!intakeForm,
+                intakeFormVisible: intakeForm?.style.display,
+                contactFormExists: !!contactForm,
+                contactFormVisible: contactForm?.style.display,
+                originalFormVisible: originalForm?.style.display,
+                messageInputExists: !!document.getElementById('message-input'),
+                sendButtonExists: !!document.getElementById('send-message-button')
+            });
+        }
+    };
+
+    // Add custom styles for the form
+    const style = document.createElement('style');
+    style.textContent = `
+        #watson-intake-form {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #watson-contact-form input:focus,
+        #watson-contact-form textarea:focus {
+            border-color: #00b795 !important;
+            box-shadow: 0 0 0 3px rgba(0, 183, 149, 0.1);
+        }
+        
+        #watson-contact-form button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 183, 149, 0.3);
+        }
+        
+        #watson-contact-form button:active {
+            transform: translateY(0);
+        }
+    `;
+    document.head.appendChild(style);
+})();
+</script>
 </body>
 <!-- END CHAT BOT CODE -->
 </html>
