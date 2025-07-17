@@ -222,6 +222,20 @@ popup.style.cssText = `
 `;
 ```
 
+### Customizing the Chat Icon Color
+
+The chat bubble icon color can be customized using CSS. Add the following to force a specific color:
+
+```css
+/* Force chat icon color */
+#anything-llm-embed-chat-button svg,
+#anything-llm-embed-chat-button svg path,
+#anything-llm-embed-chat-button svg * {
+    fill: #f5fcfb !important;
+    stroke: #f5fcfb !important;
+}
+```
+
 ### Modifying Animation Effects
 
 Adjust the cubic-bezier values for different animation curves:
