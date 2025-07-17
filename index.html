@@ -767,8 +767,17 @@
 
         console.log('Watson Chat: Showing intake form');
 
-        // Hide the original message input form
+        // Check if chat is fully loaded by looking for essential elements
+        const messageInput = document.getElementById('message-input');
         const originalForm = chatContainer.querySelector('form');
+        
+        if (!messageInput || !originalForm) {
+            console.log('Watson Chat: Chat not fully loaded yet, retrying...');
+            setTimeout(() => showIntakeForm(), 500);
+            return;
+        }
+
+        // Hide the original message input form
         if (originalForm) {
             originalForm.style.display = 'none';
             console.log('Watson Chat: Original form hidden');
@@ -778,16 +787,29 @@
         let intakeForm = document.getElementById('watson-intake-form');
         
         if (!intakeForm) {
-            // Find the greeting text container
+            // Find the greeting text container or chat history container
             const greetingContainer = chatContainer.querySelector('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center')?.parentElement?.parentElement;
+            const chatHistory = document.getElementById('chat-history');
+            const targetContainer = greetingContainer || chatHistory?.parentElement;
             
-            if (greetingContainer) {
-                // Insert the form after the greeting
+            if (targetContainer) {
+                // Insert the form after the greeting or at the top of chat
                 const formDiv = document.createElement('div');
                 formDiv.innerHTML = createIntakeForm();
-                greetingContainer.appendChild(formDiv.firstElementChild);
+                
+                if (greetingContainer) {
+                    greetingContainer.appendChild(formDiv.firstElementChild);
+                } else {
+                    // Insert before the chat history
+                    targetContainer.insertBefore(formDiv.firstElementChild, chatHistory);
+                }
+                
                 intakeForm = document.getElementById('watson-intake-form');
                 console.log('Watson Chat: Intake form created');
+            } else {
+                console.log('Watson Chat: No suitable container found yet, retrying...');
+                setTimeout(() => showIntakeForm(), 500);
+                return;
             }
         }
         
@@ -1031,6 +1053,18 @@
         }
         
         console.log('Watson Chat: Initializing form interaction');
+        
+        // Check if chat is fully loaded before marking as initialized
+        const chatContainer = document.getElementById('anything-llm-chat');
+        const messageInput = document.getElementById('message-input');
+        const chatHistory = document.getElementById('chat-history');
+        
+        if (!chatContainer || !messageInput) {
+            console.log('Watson Chat: Chat not fully loaded, waiting...');
+            setTimeout(() => initializeFormInteraction(), 500);
+            return;
+        }
+        
         chatInitialized = true;
         
         // Always check current form status
@@ -1039,7 +1073,7 @@
         
         // Show form if not submitted
         if (!formSubmitted) {
-            // Wait a bit for the chat to fully render
+            // Give the chat a moment to settle, then show form
             setTimeout(() => {
                 showIntakeForm();
                 
@@ -1048,7 +1082,7 @@
                 if (originalForm) {
                     originalForm.style.display = 'none';
                 }
-            }, 500);
+            }, 100);
         } else {
             // If form was submitted, ensure regular chat input is visible
             const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
@@ -1063,15 +1097,17 @@
         console.log('Watson Chat: Starting to watch for chat window');
         
         const observer = new MutationObserver((mutations) => {
-            // Check if chat window is visible
+            // Check if chat window is visible and fully loaded
             const chatWindow = document.getElementById('anything-llm-chat');
-            if (chatWindow) {
+            const messageInput = document.getElementById('message-input');
+            
+            if (chatWindow && messageInput) {
                 // Check if it's visible (not display: none and has dimensions)
                 const isVisible = chatWindow.offsetParent !== null || 
                                 window.getComputedStyle(chatWindow).display !== 'none';
                 
                 if (isVisible && !chatInitialized) {
-                    console.log('Watson Chat: Chat window detected as open');
+                    console.log('Watson Chat: Chat window detected as open and loaded');
                     initializeFormInteraction();
                 }
             }
@@ -1085,18 +1121,24 @@
             attributeFilter: ['style', 'class']
         });
 
-        // Also check if chat is already open
-        setTimeout(() => {
+        // Also check periodically if chat is already open
+        const checkInterval = setInterval(() => {
             const chatWindow = document.getElementById('anything-llm-chat');
-            if (chatWindow) {
+            const messageInput = document.getElementById('message-input');
+            
+            if (chatWindow && messageInput) {
                 const isVisible = chatWindow.offsetParent !== null || 
                                 window.getComputedStyle(chatWindow).display !== 'none';
-                if (isVisible) {
-                    console.log('Watson Chat: Chat window already open');
+                if (isVisible && !chatInitialized) {
+                    console.log('Watson Chat: Chat window already open and loaded');
+                    clearInterval(checkInterval);
                     initializeFormInteraction();
                 }
             }
-        }, 1000);
+        }, 500);
+        
+        // Clear interval after 30 seconds to prevent memory leak
+        setTimeout(() => clearInterval(checkInterval), 30000);
     }
 
     // Start watching when DOM is ready
