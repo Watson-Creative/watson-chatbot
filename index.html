@@ -439,25 +439,29 @@
     // Function to create the intake form
     function createIntakeForm() {
         const formHTML = `
-            <div id="watson-intake-form" class="allm-px-4 allm-py-4 allm-w-full">
+            <div id="watson-intake-form" class="allm-px-4 allm-py-4 allm-pb-6">
                 <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
-                    <div class="allm-flex allm-gap-x-2">
+                    <div class="watson-form-row watson-name-row">
                         <input type="text" id="first-name" name="firstName" placeholder="First Name" required
-                            class="allm-flex-1 allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                            class="watson-form-input">
                         <input type="text" id="last-name" name="lastName" placeholder="Last Name" required
-                            class="allm-flex-1 allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                            class="watson-form-input">
+                        <input type="text" id="title" name="title" placeholder="Title"
+                            class="watson-form-input">
                     </div>
-                    <input type="email" id="email" name="email" placeholder="Email" required
-                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
-                    <input type="tel" id="phone" name="phone" placeholder="Phone"
-                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
-                    <input type="text" id="company" name="company" placeholder="Company"
-                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+                    <div class="watson-form-row watson-contact-row">
+                        <input type="email" id="email" name="email" placeholder="Email" required
+                            class="watson-form-input">
+                        <input type="tel" id="phone" name="phone" placeholder="Phone"
+                            class="watson-form-input">
+                        <input type="text" id="company" name="company" placeholder="Company"
+                            class="watson-form-input">
+                    </div>
                     <textarea id="message" name="message" placeholder="Tell us about your project..." required
                         rows="3"
-                        class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795] allm-resize-none"></textarea>
+                        class="watson-form-input watson-form-textarea"></textarea>
                     <button type="submit" 
-                        class="allm-w-full allm-py-2 allm-px-4 allm-bg-[#00b795] allm-text-white allm-rounded-lg allm-font-medium allm-text-sm hover:allm-bg-[#00a084] allm-transition-colors">
+                        class="allm-py-3 allm-px-4 allm-rounded-lg allm-start-conversation-button">
                         Start Conversation
                     </button>
                 </form>
@@ -549,17 +553,18 @@
         const formData = new FormData(form);
         const firstName = formData.get('firstName') || '';
         const lastName = formData.get('lastName') || '';
+        const title = formData.get('title') || '';
         const email = formData.get('email') || '';
         const phone = formData.get('phone') || '';
         const company = formData.get('company') || '';
         const message = formData.get('message') || '';
 
         console.log('Watson Chat: Form data collected:', {
-            firstName, lastName, email, phone, company, message
+            firstName, lastName, title, email, phone, company, message
         });
 
         // Format the message according to the specified format
-        const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<message>${message}</message>`;
+        const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<title>${title}</title>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<message>${message}</message>`;
         console.log('Watson Chat: Formatted message:', formattedMessage);
 
         // First, show the original message input (it needs to be visible to work)
@@ -945,10 +950,77 @@
             }
         }
         
-        #watson-contact-form input:focus,
-        #watson-contact-form textarea:focus {
+        /* Form row styling for desktop */
+        .watson-form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+        
+        /* Form input styling based on provided style */
+        .watson-form-input {
+            border-style: solid;
+            border-width: 0px 0px 1px 0px;
+            border-color: #022822;
+            color: #022822;
+            text-shadow: 0 1px 1px rgba(0, 3, 51, 0.2);
+            background-color: #ffffff;
+            margin-top: 20px;
+            padding-left: 0;
+            padding-right: 10px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-family: 'Roboto Serif', serif;
+            font-size: 1.125rem;
+            line-height: 1em;
+            flex: 1;
+            border-radius: 0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .watson-form-input::placeholder {
+            color: #666666;
+            text-shadow: none;
+        }
+        
+        .watson-form-input:focus {
+            outline: none;
             border-color: #00b795 !important;
-            box-shadow: 0 0 0 3px rgba(0, 183, 149, 0.1);
+            box-shadow: none;
+        }
+        
+        .watson-form-textarea {
+            width: 100%;
+            resize: none;
+            min-height: 100px;
+        }
+        
+        /* Mobile responsive styling */
+        @media (max-width: 640px) {
+            .watson-form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .watson-form-input {
+                width: 100%;
+                margin-top: 16px;
+            }
+            
+            .watson-form-row:first-child .watson-form-input:first-child {
+                margin-top: 0;
+            }
+        }
+        
+        /* Desktop specific - ensure rows stay horizontal */
+        @media (min-width: 641px) {
+            .watson-form-row {
+                flex-direction: row;
+            }
+            
+            .watson-form-row:first-child .watson-form-input:first-child {
+                margin-top: 0;
+            }
         }
         
         #watson-contact-form button:hover {
