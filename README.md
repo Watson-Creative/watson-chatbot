@@ -1,6 +1,6 @@
 # Watson Creative Chatbot Addon
 
-A sophisticated chatbot integration for Watson Creative that includes AnythingLLM chat widget with custom popup notifications, intake form, AI disclaimer functionality, and intelligent message display formatting.
+A sophisticated chatbot integration for Watson Creative that includes AnythingLLM chat widget with custom popup notifications, intake form, AI disclaimer functionality, intelligent message display formatting, and a custom close button.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -30,6 +30,7 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Customizable timing and behavior
 - Cookie-based visitor tracking
 - Responsive design
+- Custom close button in chat window
 
 ## Features
 
@@ -74,7 +75,16 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Automatic form state reset with "Reset Chat" button
 - Robust form submission handling with multiple fallback methods
 
-### 5. **Cookie Management**
+### 5. **Custom Close Button**
+- Circular close button positioned in top-right corner of chat window
+- Dark green background (#022822) with white X icon
+- Hover effect for better user experience
+- Triggers native "Close Chat" functionality to ensure proper cleanup
+- Automatically appears when chat window opens
+- Maintains chat bubble visibility for easy reopening
+- High z-index to ensure visibility above all chat content
+
+### 6. **Cookie Management**
 - Optional cookie tracking to limit popup frequency
 - Configurable cookie duration
 - Session-based popup limits
@@ -244,6 +254,12 @@ const popupMessages = [
   - Centered layout with auto margins
   - Bottom margin of 120px
   - 10% padding on sides with calculated width
+- Close button styling:
+  - `.watson-close-button` class with circular design
+  - Dark green background (#022822) matching brand colors
+  - White X created with CSS pseudo-elements
+  - Positioned absolutely at top: 10px, right: 10px
+  - Z-index of 100000001 to ensure visibility
 
 ### 2. **Popup Functionality Script**
 - **Cookie Management**: `setCookie()`, `getCookie()`
@@ -267,6 +283,14 @@ const popupMessages = [
 - **Message Display**: `watchForFormMessages()` extracts and displays only message content
 - **Reset Handling**: `handleResetClick()` clears form state when chat is reset
 - **Initialization**: `initializeFormInteraction()` prevents duplicate initialization
+
+### 5. **Close Button Script**
+- **Button Creation**: `createCloseButton()` generates the button element with accessibility attributes
+- **Close Functionality**: `closeChat()` finds and clicks the native "Close Chat" button
+- **Button Management**: `addCloseButton()` adds the button to the chat window
+- **DOM Monitoring**: `watchForChatWindow()` uses MutationObserver to detect chat window
+- **Automatic Addition**: Button appears automatically when chat opens
+- **State Cleanup**: Resets button reference when chat window is removed
 
 ## Customization
 
@@ -312,6 +336,27 @@ transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 Update the `DISCLAIMER_TEXT` constant:
 ```javascript
 const DISCLAIMER_TEXT = " - Your custom disclaimer here.";
+```
+
+### Customizing the Close Button
+
+The close button appearance can be modified by updating the CSS:
+
+```css
+.watson-close-button {
+    background-color: #022822;  /* Change button color */
+    width: 20px;               /* Adjust size */
+    height: 20px;
+    right: 10px;               /* Adjust position */
+    top: 10px;
+}
+
+.watson-close-button::before,
+.watson-close-button::after {
+    background-color: #f5fcfb;  /* Change X color */
+    width: 15px;               /* Adjust X size */
+    height: 2px;               /* Adjust X thickness */
+}
 ```
 
 ### Customizing the Intake Form
@@ -463,6 +508,18 @@ The addon listens for:
    - Verify the CSS classes are properly applied
    - Look for "Watson Chat: Form message display updated" in console
 
+8. **Close button not appearing**
+   - Check if chat window ID is `anything-llm-chat`
+   - Verify the button is being created (check for "Watson Chat: Close button added" in console)
+   - Ensure CSS z-index is high enough (should be 100000001)
+   - Check if MutationObserver is detecting chat window
+
+9. **Close button not functioning properly**
+   - Verify the native "Close Chat" button selector hasn't changed
+   - Check console for "Watson Chat: Triggered native close button" message
+   - Ensure the button maintains chat bubble visibility (same as native close)
+   - Test that chat can be reopened after using custom close button
+
 ### Debug Mode
 
 The code includes extensive console logging with "Watson Chat:" prefix:
@@ -538,7 +595,17 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 2.2 (Current)
+### Version 2.3 (Current)
+- **Custom Close Button Addition**:
+  - Added custom close button to top-right corner of chat window
+  - Implemented circular design with dark green background (#022822)
+  - Created white X icon using CSS pseudo-elements
+  - Integrated with native "Close Chat" functionality for consistent behavior
+  - Added automatic button appearance when chat opens
+  - Implemented proper state management and cleanup
+  - Ensured chat bubble remains visible after closing (matching native behavior)
+
+### Version 2.2
 - **Progressive Form Validation Updates**:
   - Implemented required field validation for First Name, Last Name, and Email
   - Added progressive form enablement - message field and submit button disabled until required fields are filled
