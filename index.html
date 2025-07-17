@@ -1071,7 +1071,7 @@
         formSubmitted = checkFormStatus();
         console.log('Watson Chat: Form submitted status:', formSubmitted);
         
-        // Show form if not submitted
+        // Show form if not submitted - this should happen every time chat opens unless form was actually submitted
         if (!formSubmitted) {
             // Give the chat a moment to settle, then show form
             setTimeout(() => {
@@ -1109,6 +1109,20 @@
                 if (isVisible && !chatInitialized) {
                     console.log('Watson Chat: Chat window detected as open and loaded');
                     initializeFormInteraction();
+                }
+            } else if (chatWindow) {
+                // Check if chat was closed
+                const isVisible = chatWindow.offsetParent !== null || 
+                                window.getComputedStyle(chatWindow).display !== 'none';
+                
+                if (!isVisible && chatInitialized && !formSubmitted) {
+                    console.log('Watson Chat: Chat window closed, resetting state');
+                    chatInitialized = false;
+                    // Remove any existing intake form
+                    const intakeForm = document.getElementById('watson-intake-form');
+                    if (intakeForm) {
+                        intakeForm.remove();
+                    }
                 }
             }
         });
@@ -1200,6 +1214,112 @@
     // Start watching for reset button
     watchForResetButton();
     
+    // ===== CUSTOM CLOSE BUTTON FUNCTIONALITY =====
+    let closeButton = null;
+    
+    // Function to create the close button
+    function createCloseButton() {
+        const button = document.createElement('button');
+        button.className = 'watson-close-button';
+        button.setAttribute('aria-label', 'Close chat');
+        button.setAttribute('title', 'Close chat');
+        return button;
+    }
+    
+    // Function to close the chat
+    function closeChat() {
+        // Reset chat state when closing (unless form was actually submitted)
+        if (!formSubmitted) {
+            console.log('Watson Chat: Resetting chat state on close (form not submitted)');
+            chatInitialized = false;
+            // Remove the intake form if it exists
+            const intakeForm = document.getElementById('watson-intake-form');
+            if (intakeForm) {
+                intakeForm.remove();
+            }
+        }
+        
+        // Find all buttons with the specific class combination
+        const buttons = document.querySelectorAll('button.allm-h-fit.allm-px-0.hover\\:allm-cursor-pointer.allm-border-none.allm-text-sm.allm-bg-transparent.hover\\:allm-opacity-80.hover\\:allm-underline');
+        
+        // Look for the "Close Chat" button specifically
+        let nativeCloseButton = null;
+        buttons.forEach(button => {
+            if (button.textContent.trim() === 'Close Chat') {
+                nativeCloseButton = button;
+            }
+        });
+        
+        if (nativeCloseButton) {
+            // Click the native close button to ensure proper cleanup
+            nativeCloseButton.click();
+            console.log('Watson Chat: Triggered native close button');
+        } else {
+            // Fallback: Try to find and click any element that might close the chat
+            console.warn('Watson Chat: Could not find native close button, using fallback');
+            // Try alternative selector
+            const altCloseButton = Array.from(document.querySelectorAll('button')).find(
+                btn => btn.textContent.trim() === 'Close Chat'
+            );
+            if (altCloseButton) {
+                altCloseButton.click();
+            }
+        }
+    }
+    
+    // Function to add close button to chat window
+    function addCloseButton() {
+        // Check if chat window exists and button hasn't been added
+        const chatWindow = document.getElementById('anything-llm-chat');
+        if (!chatWindow || closeButton) return;
+        
+        // Create and add the close button
+        closeButton = createCloseButton();
+        closeButton.addEventListener('click', closeChat);
+        
+        // Add to the chat window container
+        chatWindow.appendChild(closeButton);
+        
+        console.log('Watson Chat: Close button added');
+    }
+    
+    // Watch for chat window to appear (for close button)
+    function watchForChatWindowCloseButton() {
+        const observer = new MutationObserver((mutations) => {
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                // Add close button if not already present
+                if (!closeButton || !closeButton.parentNode) {
+                    addCloseButton();
+                }
+            }
+            
+            // Also watch for chat window removal to clean up our button reference
+            if (closeButton && !closeButton.parentNode) {
+                closeButton = null;
+            }
+        });
+        
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style']
+        });
+        
+        // Initial check
+        setTimeout(() => {
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                addCloseButton();
+            }
+        }, 1000);
+    }
+    
+    // Start watching for close button functionality
+    watchForChatWindowCloseButton();
+    
     // Function to watch for and modify form submission messages
     function watchForFormMessages() {
         const observer = new MutationObserver((mutations) => {
@@ -1251,8 +1371,17 @@
             sessionStorage.removeItem('watson_form_submitted');
             formSubmitted = false;
             chatInitialized = false;
+            // Remove existing form
+            const intakeForm = document.getElementById('watson-intake-form');
+            if (intakeForm) {
+                intakeForm.remove();
+            }
             console.log('Watson Chat: Form state reset');
-            showIntakeForm();
+            // Re-initialize if chat is open
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                setTimeout(() => initializeFormInteraction(), 100);
+            }
         },
         checkStatus: () => {
             const intakeForm = document.getElementById('watson-intake-form');
@@ -1277,108 +1406,7 @@
 
 })();
 </script>
-<script>
-// Custom close button for Watson Creative chatbot
-(function() {
-    let closeButton = null;
-    
-    // Function to create the close button
-    function createCloseButton() {
-        const button = document.createElement('button');
-        button.className = 'watson-close-button';
-        button.setAttribute('aria-label', 'Close chat');
-        button.setAttribute('title', 'Close chat');
-        return button;
-    }
-    
-    // Function to close the chat
-    function closeChat() {
-        // Find all buttons with the specific class combination
-        const buttons = document.querySelectorAll('button.allm-h-fit.allm-px-0.hover\\:allm-cursor-pointer.allm-border-none.allm-text-sm.allm-bg-transparent.hover\\:allm-opacity-80.hover\\:allm-underline');
-        
-        // Look for the "Close Chat" button specifically
-        let closeButton = null;
-        buttons.forEach(button => {
-            if (button.textContent.trim() === 'Close Chat') {
-                closeButton = button;
-            }
-        });
-        
-        if (closeButton) {
-            // Click the native close button to ensure proper cleanup
-            closeButton.click();
-            console.log('Watson Chat: Triggered native close button');
-        } else {
-            // Fallback: Try to find and click any element that might close the chat
-            console.warn('Watson Chat: Could not find native close button, using fallback');
-            // Try alternative selector
-            const altCloseButton = Array.from(document.querySelectorAll('button')).find(
-                btn => btn.textContent.trim() === 'Close Chat'
-            );
-            if (altCloseButton) {
-                altCloseButton.click();
-            }
-        }
-    }
-    
-    // Function to add close button to chat window
-    function addCloseButton() {
-        // Check if chat window exists and button hasn't been added
-        const chatWindow = document.getElementById('anything-llm-chat');
-        if (!chatWindow || closeButton) return;
-        
-        // Create and add the close button
-        closeButton = createCloseButton();
-        closeButton.addEventListener('click', closeChat);
-        
-        // Add to the chat window container
-        chatWindow.appendChild(closeButton);
-        
-        console.log('Watson Chat: Close button added');
-    }
-    
-    // Watch for chat window to appear
-    function watchForChatWindow() {
-        const observer = new MutationObserver((mutations) => {
-            const chatWindow = document.getElementById('anything-llm-chat');
-            if (chatWindow && chatWindow.style.display !== 'none') {
-                // Add close button if not already present
-                if (!closeButton || !closeButton.parentNode) {
-                    addCloseButton();
-                }
-            }
-            
-            // Also watch for chat window removal to clean up our button reference
-            if (closeButton && !closeButton.parentNode) {
-                closeButton = null;
-            }
-        });
-        
-        // Start observing
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style']
-        });
-        
-        // Initial check
-        setTimeout(() => {
-            const chatWindow = document.getElementById('anything-llm-chat');
-            if (chatWindow && chatWindow.style.display !== 'none') {
-                addCloseButton();
-            }
-        }, 1000);
-    }
-    
-    // Start watching when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', watchForChatWindow);
-    } else {
-        watchForChatWindow();
-    }
-})();
-</script>
+
 </body>
 <!-- END CHAT BOT CODE -->
 </html>
