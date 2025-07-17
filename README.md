@@ -5,6 +5,7 @@ A sophisticated chatbot integration for Watson Creative that includes AnythingLL
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
+- [File Structure](#file-structure)
 - [Installation](#installation)
 - [Configuration](#configuration)
   - [Chat Widget Configuration](#chat-widget-configuration)
@@ -89,9 +90,39 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Configurable cookie duration
 - Session-based popup limits
 
+## File Structure
+
+The Watson Creative Chatbot Addon is now organized into separate files for better maintainability:
+
+```
+watson-chatbot/
+├── script.js        # Combined JavaScript functionality
+├── styles.css       # All CSS styles
+├── index.html       # Main HTML file
+└── README.md        # Documentation
+```
+
+### File Descriptions
+
+- **script.js**: Contains all three JavaScript modules wrapped in a master IIFE:
+  1. Chat bubble popup functionality
+  2. AI disclaimer for chatbot messages  
+  3. Form-based initial interaction system
+  
+- **styles.css**: Contains all CSS styling including:
+  - Chat popup animations and positioning
+  - Form input and button styles
+  - Close button styling
+  - Responsive design rules
+  - Z-index management
+
 ## Installation
 
-1. **Include the HTML structure**:
+1. **Include the required files in your project**:
+   - `script.js` - The main JavaScript file
+   - `styles.css` - All styling rules
+   
+2. **Add to your HTML file**:
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -99,24 +130,93 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watson Creative Chat</title>
+    
+    <!-- Include the CSS file -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Include Roboto Serif font for form styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Your content here -->
+    
+    <!-- AnythingLLM Chat Widget -->
+    <script
+        data-embed-id="5e694110-e833-4fc9-abe8-61a063d47ba6"
+        data-base-api-url="https://ai.watsoncreative.com/api/embed"
+        data-button-color="#00b795"
+        data-user-bg-color="#f5fcfb"
+        data-assistant-bg-color="#f4f2f1"
+        data-brand-image-url="https://ai.watsoncreative.com/workspace/1/settings/appearance/anything-llm-dark.png"
+        data-greeting="Hey there! I'm Watson, your digital brand strategist. Got questions about marketing, branding, or just want to chat about your next big idea? I'm all ears! What's on your mind today?"
+        data-window-height="90%"
+        data-window-width="90%"
+        data-position="bottom-right"
+        data-assistant-name="Watson"
+        data-assistant-icon="https://cdn.prod.website-files.com/64c83832db063db353be392d/64c83a0ff36e7cc6c9bcb4b8_favicon.png"
+        data-no-sponsor="true"
+        data-support-email="hello@watsoncreative.com"
+        data-send-message-text="Send message..."
+        data-reset-chat-text="Reset Chat"
+        data-show-thoughts="false"
+        src="./anythingllm-chat-widget.min.js">
+    </script>
+    
+    <!-- Include the main script file -->
+    <script src="script.js"></script>
 </body>
 </html>
 ```
 
-2. **Add the chatbot code** between the `<!-- START CHAT BOT CODE -->` and `<!-- END CHAT BOT CODE -->` comments.
+3. **Ensure file paths are correct** based on your project structure.
 
-3. **Ensure the AnythingLLM widget script is properly configured** with your specific embed ID and API URL.
-
-4. **IMPORTANT: CSS Organization**
-   - All CSS styles MUST be placed in the `<style>` tag within the HTML
-   - Do NOT use JavaScript to inject styles dynamically
-   - This ensures styles load immediately and are easier to maintain
-   - Keep all form styles, animations, and responsive rules in the single `<style>` section
+4. **Note**: The AnythingLLM widget script (`anythingllm-chat-widget.min.js`) should be loaded before `script.js` to ensure the widget is available when the enhancement scripts initialize.
 
 ## Configuration
+
+### Script Organization
+
+The `script.js` file is organized as follows:
+
+```javascript
+/**
+ * Watson Creative Chatbot Enhancement Scripts
+ * Combined functionality wrapped in a master IIFE
+ */
+(function() {
+    'use strict';
+    
+    // Script 1: Chat Bubble Popup Functionality
+    try {
+        (function() {
+            // Popup configuration and logic
+        })();
+    } catch (error) {
+        console.error('Watson Chat: Error loading popup functionality:', error);
+    }
+    
+    // Script 2: AI Disclaimer
+    try {
+        (function() {
+            // Disclaimer logic
+        })();
+    } catch (error) {
+        console.error('Watson Chat: Error loading disclaimer functionality:', error);
+    }
+    
+    // Script 3: Form-Based Interaction
+    try {
+        (function() {
+            // Form logic
+        })();
+    } catch (error) {
+        console.error('Watson Chat: Error loading form functionality:', error);
+    }
+    
+})();
+```
+
+Each script module is wrapped in its own try-catch block to prevent errors in one module from affecting the others.
 
 ### Chat Widget Configuration
 
@@ -195,7 +295,7 @@ REQUIRED data attributes:
 
 ### Popup Configuration
 
-Modify the `CONFIG` object to customize popup behavior:
+Modify the `CONFIG` object in `script.js` to customize popup behavior:
 
 ```javascript
 const CONFIG = {
@@ -218,7 +318,7 @@ const CONFIG = {
 
 ### Popup Messages
 
-Customize the engagement messages by modifying the `popupMessages` array:
+Customize the engagement messages by modifying the `popupMessages` array in `script.js`:
 
 ```javascript
 const popupMessages = [
@@ -230,10 +330,10 @@ const popupMessages = [
 
 ## Components
 
-### 1. **CSS Styles**
-- All styles consolidated in a single `<style>` tag for better organization
+### 1. **CSS Styles (styles.css)**
+All styles are now consolidated in the `styles.css` file:
 - Global font smoothing and color settings
-- Chat popup positioning and animations
+- Chat popup positioning and animations (`#watson-chat-popup`)
 - Z-index management for proper layering
 - Responsive design with mobile-first considerations
 - Form styling:
@@ -261,19 +361,23 @@ const popupMessages = [
   - Positioned absolutely at top: 10px, right: 10px
   - Z-index of 100000001 to ensure visibility
 
-### 2. **Popup Functionality Script**
+### 2. **JavaScript Components (script.js)**
+
+The JavaScript functionality is organized into three main modules:
+
+#### Popup Functionality Script
 - **Cookie Management**: `setCookie()`, `getCookie()`
 - **Popup Control**: `showChatPopup()`, `hidePopup()`, `stopPopups()`
 - **Animation**: `typeText()` for letter-by-letter animation
 - **Scheduling**: `scheduleNextPopup()`, `waitForChatWidget()`
 
-### 3. **Disclaimer Script**
+#### Disclaimer Script
 - **Message Processing**: `processAllMessages()`
 - **Disclaimer Addition**: `addDisclaimer()`
 - **DOM Monitoring**: MutationObserver setup
 - **Fallback Timer**: 1-second interval check
 
-### 4. **Form Interaction Script**
+#### Form Interaction Script
 - **Form Creation**: `createIntakeForm()` generates the HTML form
 - **Form Display**: `showIntakeForm()` manages form visibility
 - **Form Validation**: `checkRequiredFields()` monitors required fields and enables/disables elements
@@ -283,20 +387,13 @@ const popupMessages = [
 - **Message Display**: `watchForFormMessages()` extracts and displays only message content
 - **Reset Handling**: `handleResetClick()` clears form state when chat is reset
 - **Initialization**: `initializeFormInteraction()` prevents duplicate initialization
-
-### 5. **Close Button Script**
-- **Button Creation**: `createCloseButton()` generates the button element with accessibility attributes
-- **Close Functionality**: `closeChat()` finds and clicks the native "Close Chat" button
-- **Button Management**: `addCloseButton()` adds the button to the chat window
-- **DOM Monitoring**: `watchForChatWindow()` uses MutationObserver to detect chat window
-- **Automatic Addition**: Button appears automatically when chat opens
-- **State Cleanup**: Resets button reference when chat window is removed
+- **Close Button**: `createCloseButton()`, `closeChat()`, `addCloseButton()` for custom close functionality
 
 ## Customization
 
 ### Styling the Popup
 
-The popup appearance can be customized by modifying the inline styles in `showChatPopup()`:
+The popup appearance can be customized by modifying the CSS in `styles.css` or by updating the inline styles in `showChatPopup()` function in `script.js`:
 
 ```javascript
 popup.style.cssText = `
@@ -312,7 +409,7 @@ popup.style.cssText = `
 
 ### Customizing the Chat Icon Color
 
-The chat bubble icon color can be customized using CSS. Add the following to force a specific color:
+The chat bubble icon color is customized in `styles.css`:
 
 ```css
 /* Force chat icon color */
@@ -326,21 +423,21 @@ The chat bubble icon color can be customized using CSS. Add the following to for
 
 ### Modifying Animation Effects
 
-Adjust the cubic-bezier values for different animation curves:
+Adjust the cubic-bezier values in the popup styles for different animation curves:
 ```javascript
 transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 ```
 
 ### Changing Disclaimer Text
 
-Update the `DISCLAIMER_TEXT` constant:
+Update the `DISCLAIMER_TEXT` constant in `script.js`:
 ```javascript
 const DISCLAIMER_TEXT = " - Your custom disclaimer here.";
 ```
 
 ### Customizing the Close Button
 
-The close button appearance can be modified by updating the CSS:
+The close button appearance can be modified in `styles.css`:
 
 ```css
 .watson-close-button {
@@ -361,12 +458,12 @@ The close button appearance can be modified by updating the CSS:
 
 ### Customizing the Intake Form
 
-The form fields can be modified in the `createIntakeForm()` function:
+The form fields can be modified in the `createIntakeForm()` function in `script.js`:
 
 ```javascript
 // Add or remove fields as needed
 <input type="text" id="custom-field" name="customField" placeholder="Custom Field"
-    class="allm-w-full allm-px-3 allm-py-2 allm-border allm-border-gray-300 allm-rounded-lg allm-text-sm allm-bg-white focus:allm-outline-none focus:allm-border-[#00b795]">
+    class="watson-form-input">
 ```
 
 Update the message format in `handleFormSubmit()`:
@@ -378,7 +475,7 @@ const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${las
 
 The form submission message display can be customized:
 
-1. **Modify what's shown to users** - Edit the `watchForFormMessages()` function:
+1. **Modify what's shown to users** - Edit the `watchForFormMessages()` function in `script.js`:
 ```javascript
 // Extract different fields to display
 const emailMatch = text.match(/<email>(.*?)<\/email>/);
@@ -388,7 +485,7 @@ const messageMatch = text.match(/<message>(.*?)<\/message>/);
 visibleSpan.textContent = `${emailMatch[1]}: ${messageMatch[1]}`;
 ```
 
-2. **Style the displayed message**:
+2. **Style the displayed message** in `styles.css`:
 ```css
 .watson-visible-message {
     font-weight: bold;
@@ -427,7 +524,7 @@ watsonChatDebug.checkStatus();
 
 ### Internal Functions Reference
 
-Key functions that developers may need to modify:
+Key functions in `script.js` that developers may need to modify:
 
 1. **`createIntakeForm()`** - Returns HTML string for the intake form
 2. **`showIntakeForm()`** - Displays the form and hides regular chat input
@@ -520,6 +617,12 @@ The addon listens for:
    - Ensure the button maintains chat bubble visibility (same as native close)
    - Test that chat can be reopened after using custom close button
 
+10. **CSS not loading properly**
+    - Verify `styles.css` file path is correct
+    - Check that the file is included before the widget loads
+    - Ensure no CSS conflicts with existing stylesheets
+    - Check browser developer tools for 404 errors
+
 ### Debug Mode
 
 The code includes extensive console logging with "Watson Chat:" prefix:
@@ -529,6 +632,11 @@ The code includes extensive console logging with "Watson Chat:" prefix:
 watsonChatDebug.checkStatus();
 
 // Common debug logs to look for:
+"Watson Chat: Enhancement scripts loading..."
+"Watson Chat: Popup functionality loaded"
+"Watson Chat: Disclaimer functionality loaded"
+"Watson Chat: Form functionality loaded"
+"Watson Chat: All enhancement scripts loaded"
 "Watson Chat: Starting to watch for chat window"
 "Watson Chat: Chat window detected as open"
 "Watson Chat: Initializing form interaction"
@@ -595,7 +703,17 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 2.3 (Current)
+### Version 3.0 (Current)
+- **Major Refactoring - File Separation**:
+  - Separated all JavaScript code into `script.js` file
+  - Moved all CSS styles into `styles.css` file
+  - Improved code organization and maintainability
+  - Added master IIFE wrapper with error handling for each module
+  - Removed all HTML script tags from JavaScript file
+  - Added comprehensive logging for debugging
+  - Maintained all existing functionality while improving structure
+
+### Version 2.3
 - **Custom Close Button Addition**:
   - Added custom close button to top-right corner of chat window
   - Implemented circular design with dark green background (#022822)
@@ -633,6 +751,10 @@ This code is proprietary to Watson Creative. All rights reserved.
 - Updated message format to use XML-style tags for better parsing
 
 ### Key Technical Improvements
+- **File Organization**: Separated code into logical files for better maintainability
+- **Error Isolation**: Each module wrapped in try-catch blocks
+- **Enhanced Logging**: Comprehensive console logging for debugging
+- **Modular Structure**: Three independent scripts combined safely
 - CSS organization: All styles now in single location for better maintainability
 - Responsive design with mobile-first approach
 - Professional form styling with Roboto Serif font
