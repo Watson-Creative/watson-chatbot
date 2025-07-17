@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watson Creative Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<style>
+    :root {
+        --small-screen: 992px;
+    }
+    
+    
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    
+    
+    html { 
+        font-size: calc(0.8126951092611863rem + 0.15911654526534862vw); 
+    }
+    
+    html.wf-design-mode .animation-magnetic-dots {
+     pointer-events: none !important;
+    }
+    
+    @media screen and (max-width:479px) { 
+        html { 
+          font-size: calc(0.7494769874476988rem + 0.8368200836820083vw); 
+      } 
+    }
+    
+    
+    /**
+    * Global
+    */
+    
+    a {
+        transition: all .2s ease;
+    }
+    
+    ul {
+     padding-left: 30px;
+    }
+    
+    .w-lightbox-frame {
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    
+    .w-lightbox-thumbnail {
+      border-radius: 5px;
+    }
+    
+    .parallax-image {
+        width: 100vmax;
+      z-index: -1;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%,0);
+      pointer-events: none
+    }
+    
+    /**
+    * Dots Animation
+    */
+      
+    .animation-magnetic-dots div {
+      position: relative;
+      z-index: 10;
+    }
+    
+    .animation-magnetic-dots__canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    @media(min-width: 992px) {
+        .home-intro .animation-magnetic-dots,
+        .hero-section-01 .animation-magnetic-dots {
+          margin-left: -14%;
+        max-width: 95%;
+      }
+    }
+      
+    /**
+    * Links
+    */
+    .cta-right-arrow:hover img,
+    .floating-menu-link:hover img,
+    .link-white-arrow-right:hover .link-white-arrow-icon {
+        transform: translateX(10px);
+    }
+    
+    .cta-left-arrow:hover img {
+        transform: translateX(-10px);
+    }
+    
+    .cta-arrow-down:hover img,
+    .btn-load-more img {
+        transform: translateY(10px);
+    }
+    
+    .cta-right-arrow img,
+    .cta-left-arrow img,
+    .cta-arrow-down img,
+    .btn-load-more img,
+    .link-white-arrow-icon,
+    .floating-menu-link img {
+        transition: all .2s linear;
+    }
+    
+    .w-icon-dropdown-toggle::before {
+        
+        content: url('https://uploads-ssl.webflow.com/64c83832db063db353be392d/657a50f092c92b829ca917cf_icon-plus-green.svg') !important;
+    }
+    
+    .w--open .w-icon-dropdown-toggle::before {
+        content: url('https://uploads-ssl.webflow.com/64c83832db063db353be392d/657a50f0ef6d2c5c15ce0691_icon-minus-green.svg') !important;
+    }
+    
+    .secondary-menu-link-block:hover .secondary-menu-link-block-small {
+        text-decoration: underline;
+    }
+    
+    /**
+    * General
+    */
+    
+    .fancy-gallery-image video {
+        border-radius: var(--default-border-radius);
+      object-fit: cover;
+    }
+    
+    /**
+    * Forms
+    */
+    textarea {
+        resize: none;
+    }
+    
+    /**
+    * Post Listing default
+    */
+    html:not(.wf-design-mode) .post-listing-wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-auto-rows: 16px !important;
+    }
+    
+    .post-listing-item .post-listing-link:hover img {
+      opacity: 0.7;
+    }
+    html:not(.wf-design-mode) .post-listing-item  {
+    opacity: 0 !important;
+    }
+    
+    .post-listing-wrapper .post-listing-item.post-listing-item-visible {
+        opacity: 1 !important;
+    }
+    
+    
+    .post-listing-content-wrapper:hover .post-listing-link {
+        opacity: 1 !important;
+    }
+    
+    
+    /**
+    * Home
+    */
+    
+        @media(min-width: 992px) {
+          .home-hero {
+            width: calc(100% + var(--site-padding-desktop)) !important;
+          max-width: calc(100% + var(--site-padding-desktop)) !important;
+        }
+      }
+      
+    
+    /*animated scroll arrow animation*/  
+    .animated-arrow-down {
+        -webkit-animation: fade_move_down 2s ease-in-out infinite;
+        -moz-animation:    fade_move_down 2s ease-in-out infinite;
+        animation:         fade_move_down 2s ease-in-out infinite
+    }
+    
+    @-webkit-keyframes fade_move_down {
+      0%   { -webkit-transform:translate(0,-10px); opacity: 0;  }
+      50%  { opacity: 1;  }
+      100% { -webkit-transform:translate(0,10px); opacity: 0; }
+    }
+    @-moz-keyframes fade_move_down {
+      0%   { -moz-transform:translate(0,-10px); opacity: 0;  }
+      50%  { opacity: 1;  }
+      100% { -moz-transform:translate(0,10px); opacity: 0; }
+    }
+    @keyframes fade_move_down {
+      0%   { transform:translate(0,-10px); opacity: 0;  }
+      50%  { opacity: 1;  }
+      100% { transform:translate(0,10px); opacity: 0; }
+    }
+    /* Chat popup styles */
+    [class*="allm-shadow-"] {
+        box-shadow: none !important;
+    }
+    #watson-chat-popup {
+        pointer-events: auto !important;
+    }
+    #watson-chat-popup::before {
+        content: '';
+        position: absolute;
+        bottom: -7px;
+        left: 11px;
+        width: 14px;
+        height: 14px;
+        background-color: rgba(0,0,0,0.1);
+        transform: rotate(45deg);
+        border-radius: 0 0 2px 0;
+        z-index: -1;
+    }
+    #anything-llm-chat {
+        min-height: calc(100%-20px) !important;
+        height: calc(100%-20px) !important;
+        max-height: calc(100%-20px) !important;
+        /*margin: 0px 0px 10px 10px;*/
+    }
+    .anything-llm-embed-chat-container,.allm-z-50 {
+        z-index: 100000000 !important;
+    }
+</style>
+<!-- START CHAT BOT CODE -->
+<script
+  data-embed-id="5e694110-e833-4fc9-abe8-61a063d47ba6"
+  data-base-api-url="https://ai.watsoncreative.com/api/embed"
+  src="https://ai.watsoncreative.com/embed/anythingllm-chat-widget.min.js"
+  data-button-color="#00b795"
+  data-user-bg-color="#f5fcfb"
+  data-assistant-bg-color="#f4f2f1"
+  data-position="bottom-left"
+  data-no-header="true"
+  data-brand-image-url="https://cdn.prod.website-files.com/64c83832db063db353be392d/65a83d67a899b3f55c6982c0_watson-creative-mark-light-green.svg"
+  data-chat-icon="chatBubble"
+  data-position="bottom-right"
+  data-text-size="16px"
+  data-window-height="90%"
+  data-window-width="90%"
+  data-greeting="Got a big vision? Let’s talk about how Watson Creative can bring it to life."
+  data-show-thoughts="true"
+  data-no-sponsor="true"
+  data-sponsor-link="https://watsoncreative.com"
+  data-sponsor-text="Powered by Watson Creative"
+  data-username="website-visitor"
+  data-support-email="hello@watsoncreative.com"
+  data-assistant-name="Watson Creative Chat Assistant"
+  data-assistant-icon="https://cdn.prod.website-files.com/64c83832db063db353be392d/65a83d67a899b3f55c6982c0_watson-creative-mark-light-green.svg"
+></script>
+<script>
+// Chat bubble popup functionality
+(function() {
+    // ===== CONFIGURATION =====
+    const CONFIG = {
+        // Timing settings
+        POPUP_DELAY: 20000,        		// Time to wait before showing first popup
+        WIDGET_CHECK_INTERVAL: 500, 	// How often to check if widget loaded
+        POPUP_APPEAR_DELAY: 50,     	// Delay before popup animation starts
+        TYPING_START_DELAY: 300,    	// Delay before typing begins
+        LETTER_TYPE_INTERVAL: 10,   	// Time between each letter
+        AUTO_HIDE_DELAY: 10000,     	// Auto-hide after this time
+        HIDE_ANIMATION_DURATION: 300, // Hide animation duration
+        NEXT_POPUP_DELAY: 20000,     	// Time to wait before showing next popup
+        // Popup behavior settings
+        USE_COOKIE_LIMIT: false,				// Set to false to disable cookie tracking
+        COOKIE_DAYS: 1,            		// How many days to remember popup was shown
+        MAX_POPUPS_PER_SESSION: 8			// High number for continuous testing
+    };
+
+    // Array of popup messages
+    const popupMessages = [
+        "Looking for advice? We've got it.",
+        "Got a brand challenge? Let's talk.",
+        "Ready to break through the noise?",
+        "What's your next big move?",
+        "Strategy starts with a conversation.",
+        "Tell us what's keeping you up at night.",
+        "Every breakthrough starts with a question.",
+        "What change are you trying to create?",
+        "Ready to move beyond ordinary?",
+        "Let's figure this out together.",
+        "What's your brand's untold story?",
+        "Skip the small talk. What's the real challenge?",
+        "Ready for a different kind of agency conversation?",
+        "What if your brand could do more?",
+        "Let's cut through the clutter.",
+        "Got 2 minutes to explore what's possible?",
+        "Ready to turn curiosity into clarity?",
+        "Let's talk about what matters.",
+        "What's your vision? Let's make it real.",
+        "Every transformation starts here."
+    ];
+
+    // Session counter for tracking popups shown this session
+    let popupsShownThisSession = 0;
+    let continuousMode = false;
+
+    // Cookie management
+    function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    // Check if we should show popup based on configuration
+    function shouldShowPopup() {
+        // Check session limit
+        if (popupsShownThisSession >= CONFIG.MAX_POPUPS_PER_SESSION) {
+            return false;
+        }
+
+        // Check cookie limit if enabled
+        if (CONFIG.USE_COOKIE_LIMIT && getCookie('watson_chat_popup_shown')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Function to stop popups when chat button is clicked
+    function stopPopups() {
+        continuousMode = false;
+        if (CONFIG.USE_COOKIE_LIMIT) {
+            setCookie('watson_chat_popup_shown', 'true', CONFIG.COOKIE_DAYS);
+        }
+        // Hide any current popup
+        const currentPopup = document.getElementById('watson-chat-popup');
+        if (currentPopup) {
+            hidePopup(currentPopup);
+        }
+    }
+
+    // Function to trigger next popup in sequence
+    function scheduleNextPopup() {
+        setTimeout(() => {
+            if (shouldShowPopup() && continuousMode) {
+                showChatPopup();
+                popupsShownThisSession++;
+                
+                // Set cookie if enabled
+                if (CONFIG.USE_COOKIE_LIMIT) {
+                    setCookie('watson_chat_popup_shown', 'true', CONFIG.COOKIE_DAYS);
+                }
+            }
+        }, CONFIG.NEXT_POPUP_DELAY);
+    }
+
+    // Wait for chat widget to load, then start timer
+    function waitForChatWidget() {
+        const chatContainer = document.getElementById('anything-llm-embed-chat-button-container');
+        if (chatContainer) {
+            // Widget is loaded, start timer for first popup
+            setTimeout(() => {
+                if (shouldShowPopup()) {
+                    continuousMode = true;
+                    showChatPopup();
+                    popupsShownThisSession++;
+                    
+                    // Set cookie if enabled
+                    if (CONFIG.USE_COOKIE_LIMIT) {
+                        setCookie('watson_chat_popup_shown', 'true', CONFIG.COOKIE_DAYS);
+                    }
+                }
+            }, CONFIG.POPUP_DELAY);
+
+            // Add click listener to chat button to stop popups
+            const chatButton = document.getElementById('anything-llm-embed-chat-button');
+            if (chatButton) {
+                chatButton.addEventListener('click', stopPopups);
+            } else {
+                // If button not found immediately, check periodically
+                const checkForButton = setInterval(() => {
+                    const button = document.getElementById('anything-llm-embed-chat-button');
+                    if (button) {
+                        button.addEventListener('click', stopPopups);
+                        clearInterval(checkForButton);
+                    }
+                }, CONFIG.WIDGET_CHECK_INTERVAL);
+            }
+        } else {
+            // Widget not loaded yet, check again
+            setTimeout(waitForChatWidget, CONFIG.WIDGET_CHECK_INTERVAL);
+        }
+    }
+
+    // Start checking for widget on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', waitForChatWidget);
+    } else {
+        waitForChatWidget();
+    }
+
+    function showChatPopup() {
+        // Get random message
+        const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+        
+        // Find the chat button container
+        const chatContainer = document.getElementById('anything-llm-embed-chat-button-container');
+        if (!chatContainer) return;
+
+        // Create popup bubble
+        const popup = document.createElement('div');
+        popup.id = 'watson-chat-popup';
+        popup.style.cssText = `
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            background-color: white;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 0px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0);
+            width: auto;
+            font-family: Barlow, sans-serif, -apple-system;
+            font-size: 14px;
+            line-height: 1.4;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: visible;
+            cursor: default !important;
+        `;
+
+        // Remove any potential conflicting styles/shadows and carrot
+        popup.style.setProperty('box-shadow', '0 4px 12px rgba(0,0,0,0)', 'important');
+        popup.style.setProperty('border', 'none', 'important');
+
+        // Create text container
+        const textContainer = document.createElement('div');
+        textContainer.style.cssText = `
+            position: relative;
+            width: auto;
+            display: inline-block;
+            white-space: nowrap;
+        `;
+        popup.appendChild(textContainer);
+
+        // Add popup to container
+        chatContainer.appendChild(popup);
+
+        // Remove any potential carrot/tail CSS
+        const style = document.createElement('style');
+        style.textContent = '#watson-chat-popup::before, #watson-chat-popup::after { display: none !important; }';
+        document.head.appendChild(style);
+
+        // Animate popup appearance
+        setTimeout(() => {
+            popup.style.opacity = '1';
+            popup.style.transform = 'translateY(0) scale(1)';
+            popup.style.pointerEvents = 'auto';
+        }, CONFIG.POPUP_APPEAR_DELAY);
+
+        // Start typing animation after popup appears
+        setTimeout(() => {
+            typeText(textContainer, randomMessage);
+        }, CONFIG.TYPING_START_DELAY);
+
+        // Auto-hide after delay
+        setTimeout(() => {
+            hidePopup(popup);
+        }, CONFIG.AUTO_HIDE_DELAY);
+
+        // Hide on click anywhere (but don't stop continuous mode unless it's the chat button)
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#anything-llm-embed-chat-button')) {
+                hidePopup(popup);
+            }
+        }, { once: true });
+    }
+
+    function typeText(container, text) {
+        const letters = text.split('');
+        
+        letters.forEach((letter, index) => {
+            const span = document.createElement('span');
+            span.textContent = letter;
+            span.style.cssText = `
+                opacity: 0;
+                transform: translateY(-10px);
+                transition: all 0.2s ease-out;
+                display: inline-block;
+                ${letter === ' ' ? 'width: 0.25em;' : ''}
+            `;
+            container.appendChild(span);
+
+            // Animate each letter with delay
+            setTimeout(() => {
+                span.style.opacity = '1';
+                span.style.transform = 'translateY(0)';
+            }, index * CONFIG.LETTER_TYPE_INTERVAL);
+        });
+    }
+
+    function hidePopup(popup) {
+        if (popup && popup.parentNode) {
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(10px) scale(0.95)';
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.parentNode.removeChild(popup);
+                }
+                
+                // Schedule next popup if in continuous mode
+                if (continuousMode) {
+                    scheduleNextPopup();
+                }
+            }, CONFIG.HIDE_ANIMATION_DURATION);
+        }
+    }
+})();
+</script>
+<!-- END CHAT BOT CODE -->
