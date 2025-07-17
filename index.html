@@ -115,6 +115,42 @@
             min-height: 100px;
         }
         
+        /* Disabled textarea styling */
+        .watson-form-textarea:disabled {
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .watson-form-textarea:disabled::placeholder {
+            color: #c8c8c8;
+            text-decoration: line-through;
+            text-decoration-color: #9e9e9e;
+            text-decoration-thickness: 2px;
+        }
+        
+        /* Required field indicator */
+        .watson-required::placeholder {
+            color: #333;
+        }
+        
+        /* Visual indicator for required fields */
+        .watson-form-input.watson-required:invalid {
+            border-color: #022822;
+        }
+        
+        .watson-form-input.watson-required:valid {
+            border-color: #00b795;
+        }
+        
+        /* Required fields note */
+        .watson-required-note {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 12px;
+            margin-bottom: 0;
+            font-style: italic;
+        }
+        
         /* Mobile responsive styling */
         @media (max-width: 640px) {
             .watson-form-row {
@@ -597,32 +633,56 @@
             <div id="watson-intake-form" class="allm-px-4 allm-py-4 allm-pb-6">
                 <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
                     <div class="watson-form-row watson-name-row">
-                        <input type="text" id="first-name" name="firstName" placeholder="First Name" required
-                            class="watson-form-input">
-                        <input type="text" id="last-name" name="lastName" placeholder="Last Name" required
-                            class="watson-form-input">
+                        <input type="text" id="first-name" name="firstName" placeholder="First Name *" required
+                            class="watson-form-input watson-required">
+                        <input type="text" id="last-name" name="lastName" placeholder="Last Name *" required
+                            class="watson-form-input watson-required">
                         <input type="text" id="title" name="title" placeholder="Title"
                             class="watson-form-input">
                     </div>
                     <div class="watson-form-row watson-contact-row">
-                        <input type="email" id="email" name="email" placeholder="Email" required
-                            class="watson-form-input">
+                        <input type="email" id="email" name="email" placeholder="Email *" required
+                            class="watson-form-input watson-required">
                         <input type="tel" id="phone" name="phone" placeholder="Phone"
                             class="watson-form-input">
                         <input type="text" id="company" name="company" placeholder="Company"
                             class="watson-form-input">
                     </div>
-                    <textarea id="message" name="message" placeholder="Tell us about your project..." required
+                    <textarea id="message" name="message" placeholder="Tell us about your project..."
                         rows="3"
-                        class="watson-form-input watson-form-textarea"></textarea>
+                        class="watson-form-input watson-form-textarea" disabled></textarea>
                     <button type="submit" 
                         class="allm-py-3 allm-px-4 allm-rounded-lg allm-start-conversation-button">
                         Start Conversation
                     </button>
+                    <p class="watson-required-note">* Required fields</p>
                 </form>
             </div>
         `;
         return formHTML;
+    }
+
+    // Function to check if required fields are filled
+    function checkRequiredFields() {
+        const firstName = document.getElementById('first-name');
+        const lastName = document.getElementById('last-name');
+        const email = document.getElementById('email');
+        const messageField = document.getElementById('message');
+        
+        if (firstName && lastName && email && messageField) {
+            const allFilled = firstName.value.trim() !== '' && 
+                            lastName.value.trim() !== '' && 
+                            email.value.trim() !== '' &&
+                            email.validity.valid;
+            
+            if (allFilled) {
+                messageField.disabled = false;
+                messageField.placeholder = "Tell us about your project...";
+            } else {
+                messageField.disabled = true;
+                messageField.placeholder = "Tell us about your project...";
+            }
+        }
     }
 
     // Function to hide the message input area and show the form
@@ -684,6 +744,17 @@
                         }, false);
                         console.log('Watson Chat: Button click handler added');
                     }
+                    
+                    // Add input listeners for required fields
+                    const requiredFields = form.querySelectorAll('.watson-required');
+                    requiredFields.forEach(field => {
+                        field.addEventListener('input', checkRequiredFields);
+                        field.addEventListener('blur', checkRequiredFields);
+                    });
+                    console.log('Watson Chat: Required field listeners added');
+                    
+                    // Initial check
+                    checkRequiredFields();
                 }
             }
         }
