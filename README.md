@@ -52,7 +52,12 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 
 ### 4. **Form-Based Initial Interaction**
 - Custom intake form for first-time visitors
-- Collects: First Name, Last Name, Email, Phone, Company, Message
+- Collects: First Name, Last Name, Title, Email, Phone, Company, Message
+- Professional styling with bottom-border design and Roboto Serif font
+- Responsive layout:
+  - Desktop: Three inputs per row (Name fields on row 1, Contact info on row 2)
+  - Mobile: Single column layout for better usability
+- Custom "Start Conversation" button with animated underline and arrow icon
 - Automatically formats and sends data to chatbot
 - Session-based tracking to show form only once
 - Smooth transition to regular chat after submission
@@ -85,6 +90,12 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 2. **Add the chatbot code** between the `<!-- START CHAT BOT CODE -->` and `<!-- END CHAT BOT CODE -->` comments.
 
 3. **Ensure the AnythingLLM widget script is properly configured** with your specific embed ID and API URL.
+
+4. **IMPORTANT: CSS Organization**
+   - All CSS styles MUST be placed in the `<style>` tag within the HTML
+   - Do NOT use JavaScript to inject styles dynamically
+   - This ensures styles load immediately and are easier to maintain
+   - Keep all form styles, animations, and responsive rules in the single `<style>` section
 
 ## Configuration
 
@@ -141,11 +152,22 @@ const popupMessages = [
 ## Components
 
 ### 1. **CSS Styles**
+- All styles consolidated in a single `<style>` tag for better organization
 - Global font smoothing and color settings
 - Chat popup positioning and animations
 - Z-index management for proper layering
-- Responsive design considerations
-- Form input styling and focus states
+- Responsive design with mobile-first considerations
+- Form styling:
+  - Custom `.watson-form-input` class with bottom-border design
+  - Roboto Serif font at 1.125rem
+  - Professional text shadow effect
+  - Green (#00b795) focus state
+  - Responsive `.watson-form-row` containers
+- Button styling:
+  - `.allm-start-conversation-button` with transparent background
+  - Animated underline on hover
+  - Arrow icon that slides on hover
+  - Left-aligned design with fixed 300px width
 
 ### 2. **Popup Functionality Script**
 - **Cookie Management**: `setCookie()`, `getCookie()`
@@ -213,7 +235,7 @@ The form fields can be modified in the `createIntakeForm()` function:
 
 Update the message format in `handleFormSubmit()`:
 ```javascript
-const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<custom_field>${customField}</custom_field>|<message>${message}</message>`;
+const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<title>${title}</title>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<custom_field>${customField}</custom_field>|<message>${message}</message>`;
 ```
 
 ### Customizing Message Display
@@ -398,7 +420,16 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 2.0 (Current)
+### Version 2.1 (Current)
+- **Form Enhancement Updates**:
+  - Added Title field to the intake form
+  - Redesigned form layout with responsive rows
+  - Implemented professional bottom-border input styling
+  - Added custom "Start Conversation" button with animated underline
+  - Integrated Watson Creative arrow icon with hover animation
+  - **IMPORTANT**: Consolidated all CSS into single `<style>` tag (removed JavaScript style injection)
+
+### Version 2.0
 - Added custom intake form for lead capture
 - Implemented intelligent message display (shows only message content to users)
 - Added session-based form management with reset functionality
@@ -408,6 +439,9 @@ This code is proprietary to Watson Creative. All rights reserved.
 - Updated message format to use XML-style tags for better parsing
 
 ### Key Technical Improvements
+- CSS organization: All styles now in single location for better maintainability
+- Responsive design with mobile-first approach
+- Professional form styling with Roboto Serif font
 - Prevented duplicate form initialization
 - Added MutationObserver for dynamic content monitoring
 - Implemented multiple submission methods for compatibility

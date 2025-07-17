@@ -54,6 +54,161 @@
     .anything-llm-embed-chat-container,.allm-z-50 {
         z-index: 100000000 !important;
     }
+
+    #watson-intake-form {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Form row styling for desktop */
+        .watson-form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+        
+        /* Form input styling based on provided style */
+        .watson-form-input {
+            border-style: solid;
+            border-width: 0px 0px 1px 0px;
+            border-color: #022822;
+            color: #022822;
+            text-shadow: 0 1px 1px rgba(0, 3, 51, 0.2);
+            background-color: #ffffff;
+            margin-top: 20px;
+            padding-left: 0;
+            padding-right: 10px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-family: 'Roboto Serif', serif;
+            font-size: 1.125rem;
+            line-height: 1em;
+            flex: 1;
+            border-radius: 0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .watson-form-input::placeholder {
+            color: #666666;
+            text-shadow: none;
+        }
+        
+        .watson-form-input:focus {
+            outline: none;
+            border-color: #00b795 !important;
+            box-shadow: none;
+        }
+        
+        .watson-form-textarea {
+            width: 100%;
+            resize: none;
+            min-height: 100px;
+        }
+        
+        /* Mobile responsive styling */
+        @media (max-width: 640px) {
+            .watson-form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .watson-form-input {
+                width: 100%;
+                margin-top: 16px;
+            }
+            
+            .watson-form-row:first-child .watson-form-input:first-child {
+                margin-top: 0;
+            }
+        }
+        
+        /* Desktop specific - ensure rows stay horizontal */
+        @media (min-width: 641px) {
+            .watson-form-row {
+                flex-direction: row;
+            }
+            
+            .watson-form-row:first-child .watson-form-input:first-child {
+                margin-top: 0;
+            }
+        }
+        
+        /* Start Conversation button styling */
+        .allm-start-conversation-button {
+            position: relative;
+            color: #00b795;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1em;
+            background-color: transparent;
+            border: 0px;
+            display: inline-flex;
+            align-items: left;
+            justify-content: left;
+            gap: 12px;
+            transition: all 0.3s ease;
+            width: 300px;
+            margin: 0px;
+            margin-top: 20px;
+            padding: 12px 0;
+            cursor: pointer;
+        }
+        
+        /* Animated underline */
+        .allm-start-conversation-button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #00b795;
+            transition: width 0.3s ease;
+        }
+        
+        /* Arrow icon */
+        .allm-start-conversation-button::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-image: url('https://cdn.prod.website-files.com/64c83832db063db353be392d/64f8ba90b34c615ed9323235_arrow-right-big-green.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Hover states */
+        .allm-start-conversation-button:hover::before {
+            width: 100%;
+        }
+        
+        .allm-start-conversation-button:hover::after {
+            transform: translateX(4px);
+        }
+        
+        /* Style to hide the form data in the first user message */
+        .watson-form-submission-message {
+            font-size: 0 !important;
+            line-height: 0 !important;
+        }
+        
+        .watson-form-submission-message .watson-visible-message {
+            font-size: 16px !important;
+            line-height: 20px !important;
+            display: inline-block;
+        }
 </style>
 <script
   data-embed-id="5e694110-e833-4fc9-abe8-61a063d47ba6"
@@ -932,119 +1087,7 @@
         }
     };
 
-    // Add custom styles for the form
-    const style = document.createElement('style');
-    style.textContent = `
-        #watson-intake-form {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Form row styling for desktop */
-        .watson-form-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 0;
-        }
-        
-        /* Form input styling based on provided style */
-        .watson-form-input {
-            border-style: solid;
-            border-width: 0px 0px 1px 0px;
-            border-color: #022822;
-            color: #022822;
-            text-shadow: 0 1px 1px rgba(0, 3, 51, 0.2);
-            background-color: #ffffff;
-            margin-top: 20px;
-            padding-left: 0;
-            padding-right: 10px;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            font-family: 'Roboto Serif', serif;
-            font-size: 1.125rem;
-            line-height: 1em;
-            flex: 1;
-            border-radius: 0;
-            transition: border-color 0.3s ease;
-        }
-        
-        .watson-form-input::placeholder {
-            color: #666666;
-            text-shadow: none;
-        }
-        
-        .watson-form-input:focus {
-            outline: none;
-            border-color: #00b795 !important;
-            box-shadow: none;
-        }
-        
-        .watson-form-textarea {
-            width: 100%;
-            resize: none;
-            min-height: 100px;
-        }
-        
-        /* Mobile responsive styling */
-        @media (max-width: 640px) {
-            .watson-form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .watson-form-input {
-                width: 100%;
-                margin-top: 16px;
-            }
-            
-            .watson-form-row:first-child .watson-form-input:first-child {
-                margin-top: 0;
-            }
-        }
-        
-        /* Desktop specific - ensure rows stay horizontal */
-        @media (min-width: 641px) {
-            .watson-form-row {
-                flex-direction: row;
-            }
-            
-            .watson-form-row:first-child .watson-form-input:first-child {
-                margin-top: 0;
-            }
-        }
-        
-        #watson-contact-form button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 183, 149, 0.3);
-        }
-        
-        #watson-contact-form button:active {
-            transform: translateY(0);
-        }
-        
-        /* Style to hide the form data in the first user message */
-        .watson-form-submission-message {
-            font-size: 0 !important;
-            line-height: 0 !important;
-        }
-        
-        .watson-form-submission-message .watson-visible-message {
-            font-size: 16px !important;
-            line-height: 20px !important;
-            display: inline-block;
-        }
-    `;
-    document.head.appendChild(style);
+
 })();
 </script>
 </body>
