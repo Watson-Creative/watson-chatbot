@@ -1,6 +1,6 @@
 # Watson Creative Chatbot Addon
 
-A sophisticated chatbot integration for Watson Creative that includes AnythingLLM chat widget with custom popup notifications and AI disclaimer functionality.
+A sophisticated chatbot integration for Watson Creative that includes AnythingLLM chat widget with custom popup notifications, intake form, AI disclaimer functionality, and intelligent message display formatting.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -12,13 +12,17 @@ A sophisticated chatbot integration for Watson Creative that includes AnythingLL
 - [API Reference](#api-reference)
 - [Browser Support](#browser-support)
 - [Troubleshooting](#troubleshooting)
+- [Recent Updates](#recent-updates)
 
 ## Overview
 
 This chatbot addon integrates the AnythingLLM chat widget into your website with enhanced features including:
+- Custom intake form for lead capture
 - Automated popup messages to engage visitors
 - Typing animation effects
 - AI disclaimer notices
+- Intelligent message display formatting
+- Session-based form management
 - Customizable timing and behavior
 - Cookie-based visitor tracking
 - Responsive design
@@ -52,6 +56,9 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Automatically formats and sends data to chatbot
 - Session-based tracking to show form only once
 - Smooth transition to regular chat after submission
+- Intelligent message display - shows only user message while preserving full data for LLM
+- Automatic form state reset with "Reset Chat" button
+- Robust form submission handling with multiple fallback methods
 
 ### 5. **Cookie Management**
 - Optional cookie tracking to limit popup frequency
@@ -156,8 +163,11 @@ const popupMessages = [
 - **Form Creation**: `createIntakeForm()` generates the HTML form
 - **Form Display**: `showIntakeForm()` manages form visibility
 - **Form Submission**: `handleFormSubmit()` processes and formats data
-- **Message Formatting**: Sends data as `\\\|First Name:VALUE|Last Name:VALUE|Email:VALUE|Phone:VALUE|Company:VALUE|Message:VALUE|\\\`
+- **Message Formatting**: Sends data as `<first_name>VALUE</first_name>|<last_name>VALUE</last_name>|<email>VALUE</email>|<phone>VALUE</phone>|<company>VALUE</company>|<message>VALUE</message>`
 - **Session Management**: Uses sessionStorage to track form submission
+- **Message Display**: `watchForFormMessages()` extracts and displays only message content
+- **Reset Handling**: `handleResetClick()` clears form state when chat is reset
+- **Initialization**: `initializeFormInteraction()` prevents duplicate initialization
 
 ## Customization
 
@@ -203,22 +213,71 @@ The form fields can be modified in the `createIntakeForm()` function:
 
 Update the message format in `handleFormSubmit()`:
 ```javascript
-const formattedMessage = `\\\\\\|First Name:${firstName}|Last Name:${lastName}|Email:${email}|Phone:${phone}|Company:${company}|Custom Field:${customField}|Message:${message}|\\\\\\`;
+const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<custom_field>${customField}</custom_field>|<message>${message}</message>`;
+```
+
+### Customizing Message Display
+
+The form submission message display can be customized:
+
+1. **Modify what's shown to users** - Edit the `watchForFormMessages()` function:
+```javascript
+// Extract different fields to display
+const emailMatch = text.match(/<email>(.*?)<\/email>/);
+const messageMatch = text.match(/<message>(.*?)<\/message>/);
+
+// Display both email and message
+visibleSpan.textContent = `${emailMatch[1]}: ${messageMatch[1]}`;
+```
+
+2. **Style the displayed message**:
+```css
+.watson-visible-message {
+    font-weight: bold;
+    color: #00b795;
+    /* Add more styles */
+}
 ```
 
 ## API Reference
 
 ### Public Functions
 
-While the code uses an IIFE pattern for encapsulation, you can expose functions if needed:
+The addon exposes debugging functions through `window.watsonChatDebug`:
 
 ```javascript
-window.watsonChat = {
-    stopPopups: stopPopups,
-    showPopup: showChatPopup,
-    // Add more exposed functions...
-};
+// Show the intake form manually
+watsonChatDebug.showForm();
+
+// Reset form state and show it again
+watsonChatDebug.resetForm();
+
+// Check current status of the form system
+watsonChatDebug.checkStatus();
+// Returns object with:
+// - formSubmitted: boolean
+// - chatInitialized: boolean
+// - sessionStorage: string
+// - intakeFormExists: boolean
+// - intakeFormVisible: string
+// - contactFormExists: boolean
+// - contactFormVisible: string
+// - originalFormVisible: string
+// - messageInputExists: boolean
+// - sendButtonExists: boolean
 ```
+
+### Internal Functions Reference
+
+Key functions that developers may need to modify:
+
+1. **`createIntakeForm()`** - Returns HTML string for the intake form
+2. **`showIntakeForm()`** - Displays the form and hides regular chat input
+3. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
+4. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
+5. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
+6. **`watchForResetButton()`** - Detects and handles chat reset button clicks
+7. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
 
 ### Events
 
@@ -226,6 +285,9 @@ The addon listens for:
 - `DOMContentLoaded` - Initialize when page loads
 - Click events - Dismiss popups
 - Chat button clicks - Stop popup sequence
+- Form submission - Processes and sends intake data
+- Reset button clicks - Clears form state
+- DOM mutations - Monitors for chat messages and form display
 
 ## Browser Support
 
@@ -272,15 +334,56 @@ The addon listens for:
    - Verify send button (`#send-message-button`) is present
    - Check console for JavaScript errors
    - Ensure form validation passes (required fields)
+   - Look for "Watson Chat:" prefixed console logs for debugging info
+   - Verify the chat widget is fully loaded before form submission
+
+6. **Form appears but disappears immediately**
+   - Check for duplicate initialization (see console logs)
+   - Ensure only one instance of the script is running
+   - Verify the form container and form element are both visible
+   - Check `watsonChatDebug.checkStatus()` for visibility states
+
+7. **Message display showing full data instead of just message**
+   - Ensure `watchForFormMessages()` is running
+   - Check that the message format matches the expected pattern
+   - Verify the CSS classes are properly applied
+   - Look for "Watson Chat: Form message display updated" in console
 
 ### Debug Mode
 
-Add console logging for debugging:
+The code includes extensive console logging with "Watson Chat:" prefix:
+
 ```javascript
-console.log('Watson chat popup: Widget loaded');
-console.log('Watson chat popup: Showing popup', randomMessage);
-console.log('Watson disclaimer script started monitoring');
+// Check form system status
+watsonChatDebug.checkStatus();
+
+// Common debug logs to look for:
+"Watson Chat: Starting to watch for chat window"
+"Watson Chat: Chat window detected as open"
+"Watson Chat: Initializing form interaction"
+"Watson Chat: Showing intake form"
+"Watson Chat: Form submitted"
+"Watson Chat: Message sent successfully"
+"Watson Chat: Form message display updated"
+
+// Enable additional logging by modifying the code:
+console.log('Watson Chat: Custom debug message', variableToInspect);
 ```
+
+### Form Submission Flow
+
+Understanding the submission process for debugging:
+
+1. **Form Submit** → `handleFormSubmit()` called
+2. **Data Collection** → Form data extracted and formatted
+3. **UI Switch** → Original form shown, intake form hidden
+4. **Wait for Input** → Polls for message input availability
+5. **Send Message** → Multiple methods attempted:
+   - Native value setter for React compatibility
+   - Form submission event
+   - Button click event
+   - Enter key simulation
+6. **Display Update** → `watchForFormMessages()` modifies display
 
 ### Performance Considerations
 
@@ -292,6 +395,24 @@ console.log('Watson disclaimer script started monitoring');
 ## License
 
 This code is proprietary to Watson Creative. All rights reserved.
+
+## Recent Updates
+
+### Version 2.0 (Current)
+- Added custom intake form for lead capture
+- Implemented intelligent message display (shows only message content to users)
+- Added session-based form management with reset functionality
+- Improved form submission handling with React compatibility
+- Added comprehensive debugging tools via `watsonChatDebug`
+- Enhanced error handling and fallback mechanisms
+- Updated message format to use XML-style tags for better parsing
+
+### Key Technical Improvements
+- Prevented duplicate form initialization
+- Added MutationObserver for dynamic content monitoring
+- Implemented multiple submission methods for compatibility
+- Added proper event handling for React-based chat widget
+- Improved CSS isolation with specific class targeting
 
 ## Support
 

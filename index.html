@@ -852,6 +852,50 @@
 
     // Start watching for reset button
     watchForResetButton();
+    
+    // Function to watch for and modify form submission messages
+    function watchForFormMessages() {
+        const observer = new MutationObserver((mutations) => {
+            // Look for user messages that contain our form data
+            const userMessages = document.querySelectorAll('.allm-anything-llm-user-message p');
+            
+            userMessages.forEach(p => {
+                const text = p.textContent;
+                // Check if this is a form submission message
+                if (text.includes('<first_name>') && text.includes('<message>') && !p.classList.contains('watson-processed')) {
+                    // Extract the message content
+                    const messageMatch = text.match(/<message>(.*?)<\/message>/);
+                    if (messageMatch) {
+                        const messageContent = messageMatch[1];
+                        
+                        // Add class to identify this message
+                        p.classList.add('watson-form-submission-message', 'watson-processed');
+                        
+                        // Create a span for the visible message
+                        const visibleSpan = document.createElement('span');
+                        visibleSpan.className = 'watson-visible-message';
+                        visibleSpan.textContent = messageContent;
+                        
+                        // Clear the paragraph and add only the visible message
+                        p.innerHTML = '';
+                        p.appendChild(visibleSpan);
+                        
+                        console.log('Watson Chat: Form message display updated');
+                    }
+                }
+            });
+        });
+        
+        // Start observing the chat container
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    }
+    
+    // Start watching for form messages
+    watchForFormMessages();
 
     // Expose functions for debugging
     window.watsonChatDebug = {
@@ -914,6 +958,18 @@
         
         #watson-contact-form button:active {
             transform: translateY(0);
+        }
+        
+        /* Style to hide the form data in the first user message */
+        .watson-form-submission-message {
+            font-size: 0 !important;
+            line-height: 0 !important;
+        }
+        
+        .watson-form-submission-message .watson-visible-message {
+            font-size: 16px !important;
+            line-height: 20px !important;
+            display: inline-block;
         }
     `;
     document.head.appendChild(style);
