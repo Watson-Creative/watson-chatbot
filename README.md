@@ -7,6 +7,10 @@ A sophisticated chatbot integration for Watson Creative that includes AnythingLL
 - [Features](#features)
 - [Installation](#installation)
 - [Configuration](#configuration)
+  - [Chat Widget Configuration](#chat-widget-configuration)
+  - [AnythingLLM Widget Reference](#anythingllm-widget-reference)
+  - [Popup Configuration](#popup-configuration)
+  - [Popup Messages](#popup-messages)
 - [Components](#components)
 - [Customization](#customization)
 - [API Reference](#api-reference)
@@ -118,6 +122,66 @@ data-position="bottom-right"  // Widget position
 data-window-height="90%"  // Chat window height
 data-window-width="90%"  // Chat window width
 ```
+
+### AnythingLLM Widget Reference
+
+The AnythingLLM embedded chat widget is the core component of this integration. Here's the complete reference for all available configuration options:
+
+#### Script Tag Implementation
+```html
+<!--
+REQUIRED data attributes:
+  data-embed-id        // The unique id of your embed with its default settings
+  data-base-api-url    // The URL of your anythingLLM instance backend
+-->
+<script
+  data-embed-id="5fc05aaf-2f2c-4c84-87a3-367a4692c1ee"
+  data-base-api-url="http://localhost:3001/api/embed"
+  src="http://localhost:3000/embed/anythingllm-chat-widget.min.js"
+></script>
+```
+
+#### LLM Override Options
+- **`data-prompt`** — Override the chat window with a custom system prompt. This is not visible to the user. If undefined it will use the embeds attached workspace system prompt.
+- **`data-model`** — Override the chat model used for responses. This must be a valid model string for your AnythingLLM LLM provider. If unset it will use the embeds attached workspace model selection or the system setting.
+- **`data-temperature`** — Override the chat model temperature. This must be a valid value for your AnythingLLM LLM provider. If unset it will use the embeds attached workspace model temperature or the system setting.
+
+#### Language & Localization
+- **`data-language`** — Set the language for the chat interface. If not specified, it will default to English (en). [Supported languages](https://github.com/Mintplex-Labs/anythingllm-embed/main/src/locales/resources.js):
+  - Arabic (ar), Danish (da), German (de), English (en), Spanish (es), Persian (fa), French (fr), Hebrew (he), Italian (it), Japanese (ja), Korean (ko), Dutch (nl), Portuguese BR (pt_BR), Russian (ru), Turkish (tr), Vietnamese (vn), Chinese (zh), Chinese TW (zh_TW)
+
+#### Style Override Options
+- **`data-chat-icon`** — The chat bubble icon show when chat is closed. Options: `plus`, `chatBubble`, `support`, `search2`, `search`, `magic`
+- **`data-button-color`** — The chat bubble background color shown when chat is closed. Value must be hex color code.
+- **`data-user-bg-color`** — The background color of the user chat bubbles when chatting. Value must be hex color code.
+- **`data-assistant-bg-color`** — The background color of the assistant response chat bubbles when chatting. Value must be hex color code.
+- **`data-brand-image-url`** — URL to image that will be show at the top of the chat when chat is open.
+- **`data-greeting`** — Default text message to be shown when chat is opened and no previous message history is found.
+- **`data-no-sponsor`** — Setting this attribute to anything will hide the custom or default sponsor at the bottom of an open chat window.
+- **`data-no-header`** — Setting this attribute hides the header above the chat window.
+- **`data-sponsor-link`** — A clickable link in the sponsor section in the footer of an open chat window.
+- **`data-sponsor-text`** — The text displays in sponsor text in the footer of an open chat window.
+- **`data-position`** — Adjust the positioning of the embed chat widget and open chat button. Default `bottom-right`. Options: `bottom-right`, `bottom-left`, `top-right`, `top-left`
+- **`data-assistant-name`** — Set the chat assistant name that appears above each chat message. Default `AnythingLLM Chat Assistant`
+- **`data-assistant-icon`** — Set the icon of the chat assistant.
+- **`data-window-height`** — Set the chat window height. **must include CSS suffix:** `px`,`%`,`rem`
+- **`data-window-width`** — Set the chat window width. **must include CSS suffix:** `px`,`%`,`rem`
+- **`data-text-size`** — Set the text size of the chats in pixels.
+- **`data-username`** — A specific readable name or identifier for the client for your reference. Will be shown in AnythingLLM chat logs. If empty it will not be reported.
+- **`data-default-messages`** — A string of comma-separated messages you want to display to the user when the chat widget has no history. Example: `"How are you?, What is so interesting about this project?, Tell me a joke."`
+- **`data-send-message-text`** — Override the placeholder text in the message input field.
+- **`data-reset-chat-text`** — Override the text shown on the reset chat button.
+
+#### Behavior Override Options
+- **`data-open-on-load`** — Once loaded, open the chat as default. It can still be closed by the user. To enable set this attribute to `on`. All other values will be ignored.
+- **`data-show-thoughts`** — Allow users to see the AI's thought process, if applicable, in responses. If set to "false", users will only see a static "Thinking" indication without the explicit thought content. If "true" the user will see the full thought content as well as the real response. Defaults to "false".
+- **`data-support-email`** — Shows a support email that the user can used to draft an email via the "three dot" menu in the top right. Option will not appear if it is not set.
+
+#### Security Considerations
+- Users will _not_ be able to view or read context snippets like they can in the core AnythingLLM application
+- Users are assigned a random session ID that they use to persist a chat session
+- **Recommended**: You can limit both the number of chats an embedding can process **and** per-session
+- By using the AnythingLLM embedded chat widget you are responsible for securing and configuration of the embed as to not allow excessive chat model abuse of your instance
 
 ### Popup Configuration
 
@@ -441,6 +505,32 @@ Understanding the submission process for debugging:
 - Fallback interval runs every second
 - Consider reducing `MAX_POPUPS_PER_SESSION` for better performance
 - Optimize `popupMessages` array size
+
+## AnythingLLM Development Notes
+
+### Local Development Setup
+If you need to modify the AnythingLLM widget itself:
+
+1. Clone the AnythingLLM embed repository
+2. Navigate to the embed directory: `cd anythingllm-embed-main`
+3. Install dependencies: `yarn`
+4. Start development server: `yarn dev`
+5. Build for production: `yarn build`
+
+The built widget will be available at `anythingllm-chat-widget.min.js`.
+
+### Widget File Structure
+- `src/App.jsx` - Main application component
+- `src/components/ChatWindow/` - Chat interface components
+- `src/hooks/` - Custom React hooks for chat functionality
+- `src/models/chatService.js` - API communication logic
+- `src/locales/` - Internationalization files
+
+### Important Files for Customization
+- `src/components/ChatWindow/Header/index.jsx` - Chat header customization
+- `src/components/ChatWindow/ChatContainer/PromptInput/index.jsx` - Input field behavior
+- `src/components/OpenButton/index.jsx` - Chat bubble button
+- `src/index.css` - Global styles
 
 ## License
 
