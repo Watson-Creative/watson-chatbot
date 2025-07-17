@@ -52,12 +52,17 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 
 ### 4. **Form-Based Initial Interaction**
 - Custom intake form for first-time visitors
-- Collects: First Name, Last Name, Title, Email, Phone, Company, Message
+- Collects: First Name*, Last Name*, Title, Email*, Phone, Company, Message (*Required fields)
+- Progressive form enablement:
+  - Message field is disabled with strikethrough until required fields are filled
+  - Submit button is disabled with strikethrough until required fields are filled
+  - Visual indicators for required fields (asterisks and note)
 - Professional styling with bottom-border design and Roboto Serif font
 - Responsive layout:
   - Desktop: Three inputs per row (Name fields on row 1, Contact info on row 2)
   - Mobile: Single column layout for better usability
 - Custom "Start Conversation" button with animated underline and arrow icon
+- Form container styling with centered layout and bottom margin
 - Automatically formats and sends data to chatbot
 - Session-based tracking to show form only once
 - Smooth transition to regular chat after submission
@@ -161,13 +166,20 @@ const popupMessages = [
   - Custom `.watson-form-input` class with bottom-border design
   - Roboto Serif font at 1.125rem
   - Professional text shadow effect
-  - Green (#00b795) focus state
+  - Green (#00b795) focus state for valid required fields
   - Responsive `.watson-form-row` containers
+  - Disabled state styling for message field and submit button
+  - Strikethrough effect for disabled elements
 - Button styling:
   - `.allm-start-conversation-button` with transparent background
-  - Animated underline on hover
+  - Animated underline on hover (only when enabled)
   - Arrow icon that slides on hover
   - Left-aligned design with fixed 300px width
+  - Disabled state with strikethrough and reduced opacity
+- Form container:
+  - Centered layout with auto margins
+  - Bottom margin of 120px
+  - 10% padding on sides with calculated width
 
 ### 2. **Popup Functionality Script**
 - **Cookie Management**: `setCookie()`, `getCookie()`
@@ -184,8 +196,9 @@ const popupMessages = [
 ### 4. **Form Interaction Script**
 - **Form Creation**: `createIntakeForm()` generates the HTML form
 - **Form Display**: `showIntakeForm()` manages form visibility
+- **Form Validation**: `checkRequiredFields()` monitors required fields and enables/disables elements
 - **Form Submission**: `handleFormSubmit()` processes and formats data
-- **Message Formatting**: Sends data as `<first_name>VALUE</first_name>|<last_name>VALUE</last_name>|<email>VALUE</email>|<phone>VALUE</phone>|<company>VALUE</company>|<message>VALUE</message>`
+- **Message Formatting**: Sends data as `<first_name>VALUE</first_name>|<last_name>VALUE</last_name>|<title>VALUE</title>|<email>VALUE</email>|<phone>VALUE</phone>|<company>VALUE</company>|<message>VALUE</message>`
 - **Session Management**: Uses sessionStorage to track form submission
 - **Message Display**: `watchForFormMessages()` extracts and displays only message content
 - **Reset Handling**: `handleResetClick()` clears form state when chat is reset
@@ -295,11 +308,12 @@ Key functions that developers may need to modify:
 
 1. **`createIntakeForm()`** - Returns HTML string for the intake form
 2. **`showIntakeForm()`** - Displays the form and hides regular chat input
-3. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
-4. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
-5. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
-6. **`watchForResetButton()`** - Detects and handles chat reset button clicks
-7. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
+3. **`checkRequiredFields()`** - Validates required fields and enables/disables form elements
+4. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
+5. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
+6. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
+7. **`watchForResetButton()`** - Detects and handles chat reset button clicks
+8. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
 
 ### Events
 
@@ -420,7 +434,16 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 2.1 (Current)
+### Version 2.2 (Current)
+- **Progressive Form Validation Updates**:
+  - Implemented required field validation for First Name, Last Name, and Email
+  - Added progressive form enablement - message field and submit button disabled until required fields are filled
+  - Added strikethrough effect for disabled elements
+  - Enhanced visual feedback with asterisks for required fields
+  - Added explanatory note: "* Required fields must be filled before starting a conversation"
+  - Updated form container styling with centered layout and proper spacing
+
+### Version 2.1
 - **Form Enhancement Updates**:
   - Added Title field to the intake form
   - Redesigned form layout with responsive rows

@@ -57,6 +57,10 @@
 
     #watson-intake-form {
             animation: fadeIn 0.3s ease-in-out;
+            margin: 0 auto;
+            margin-bottom: 120px;
+            padding: 0px 10%;
+            width: calc(100% - 20%);
         }
         
         @keyframes fadeIn {
@@ -225,12 +229,25 @@
             transition: transform 0.3s ease;
         }
         
-        /* Hover states */
-        .allm-start-conversation-button:hover::before {
+        /* Disabled button styling */
+        .allm-start-conversation-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            text-decoration: line-through;
+            text-decoration-color: #9e9e9e;
+            text-decoration-thickness: 2px;
+        }
+        
+        .allm-start-conversation-button:disabled::after {
+            opacity: 0.5;
+        }
+        
+        /* Hover states - only apply when not disabled */
+        .allm-start-conversation-button:not(:disabled):hover::before {
             width: 100%;
         }
         
-        .allm-start-conversation-button:hover::after {
+        .allm-start-conversation-button:not(:disabled):hover::after {
             transform: translateX(4px);
         }
         
@@ -630,7 +647,7 @@
     // Function to create the intake form
     function createIntakeForm() {
         const formHTML = `
-            <div id="watson-intake-form" class="allm-px-4 allm-py-4 allm-pb-6">
+            <div id="watson-intake-form" class="">
                 <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
                     <div class="watson-form-row watson-name-row">
                         <input type="text" id="first-name" name="firstName" placeholder="First Name *" required
@@ -652,10 +669,10 @@
                         rows="3"
                         class="watson-form-input watson-form-textarea" disabled></textarea>
                     <button type="submit" 
-                        class="allm-py-3 allm-px-4 allm-rounded-lg allm-start-conversation-button">
+                        class="allm-start-conversation-button" disabled>
                         Start Conversation
                     </button>
-                    <p class="watson-required-note">* Required fields</p>
+                    <p class="watson-required-note">* Required fields must be filled before starting a conversation.</p>
                 </form>
             </div>
         `;
@@ -668,8 +685,9 @@
         const lastName = document.getElementById('last-name');
         const email = document.getElementById('email');
         const messageField = document.getElementById('message');
+        const submitButton = document.querySelector('.allm-start-conversation-button');
         
-        if (firstName && lastName && email && messageField) {
+        if (firstName && lastName && email && messageField && submitButton) {
             const allFilled = firstName.value.trim() !== '' && 
                             lastName.value.trim() !== '' && 
                             email.value.trim() !== '' &&
@@ -678,9 +696,11 @@
             if (allFilled) {
                 messageField.disabled = false;
                 messageField.placeholder = "Tell us about your project...";
+                submitButton.disabled = false;
             } else {
                 messageField.disabled = true;
                 messageField.placeholder = "Tell us about your project...";
+                submitButton.disabled = true;
             }
         }
     }
