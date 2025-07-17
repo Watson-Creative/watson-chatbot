@@ -45,6 +45,47 @@
         border-radius: 0 0 2px 0;
         z-index: -1;
     }
+    
+    /* Custom close button styling */
+    .watson-close-button {
+        /* Basic styling for the button itself */
+        background-color: #022822; 
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 20px;
+        height: 20px;
+        z-index: 100000001; /* Ensure it's above chat content */
+        border-radius: 50%;
+        transition: opacity 0.2s ease;
+    }
+
+    .watson-close-button:hover {
+        opacity: 0.8;
+    }
+
+    .watson-close-button::before,
+    .watson-close-button::after {
+        content: '';
+        position: absolute;
+        height: 2px;
+        width: 15px;
+        background-color: #f5fcfb;
+        left: 50%;
+        top: 50%;
+        transform-origin: center;
+    }
+
+    .watson-close-button::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .watson-close-button::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
     /* Force chat icon color to #f5fcfb */
     #anything-llm-embed-chat-button svg,
     #anything-llm-embed-chat-button svg path,
@@ -1192,6 +1233,108 @@
     };
 
 
+})();
+</script>
+<script>
+// Custom close button for Watson Creative chatbot
+(function() {
+    let closeButton = null;
+    
+    // Function to create the close button
+    function createCloseButton() {
+        const button = document.createElement('button');
+        button.className = 'watson-close-button';
+        button.setAttribute('aria-label', 'Close chat');
+        button.setAttribute('title', 'Close chat');
+        return button;
+    }
+    
+    // Function to close the chat
+    function closeChat() {
+        // Find all buttons with the specific class combination
+        const buttons = document.querySelectorAll('button.allm-h-fit.allm-px-0.hover\\:allm-cursor-pointer.allm-border-none.allm-text-sm.allm-bg-transparent.hover\\:allm-opacity-80.hover\\:allm-underline');
+        
+        // Look for the "Close Chat" button specifically
+        let closeButton = null;
+        buttons.forEach(button => {
+            if (button.textContent.trim() === 'Close Chat') {
+                closeButton = button;
+            }
+        });
+        
+        if (closeButton) {
+            // Click the native close button to ensure proper cleanup
+            closeButton.click();
+            console.log('Watson Chat: Triggered native close button');
+        } else {
+            // Fallback: Try to find and click any element that might close the chat
+            console.warn('Watson Chat: Could not find native close button, using fallback');
+            // Try alternative selector
+            const altCloseButton = Array.from(document.querySelectorAll('button')).find(
+                btn => btn.textContent.trim() === 'Close Chat'
+            );
+            if (altCloseButton) {
+                altCloseButton.click();
+            }
+        }
+    }
+    
+    // Function to add close button to chat window
+    function addCloseButton() {
+        // Check if chat window exists and button hasn't been added
+        const chatWindow = document.getElementById('anything-llm-chat');
+        if (!chatWindow || closeButton) return;
+        
+        // Create and add the close button
+        closeButton = createCloseButton();
+        closeButton.addEventListener('click', closeChat);
+        
+        // Add to the chat window container
+        chatWindow.appendChild(closeButton);
+        
+        console.log('Watson Chat: Close button added');
+    }
+    
+    // Watch for chat window to appear
+    function watchForChatWindow() {
+        const observer = new MutationObserver((mutations) => {
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                // Add close button if not already present
+                if (!closeButton || !closeButton.parentNode) {
+                    addCloseButton();
+                }
+            }
+            
+            // Also watch for chat window removal to clean up our button reference
+            if (closeButton && !closeButton.parentNode) {
+                closeButton = null;
+            }
+        });
+        
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style']
+        });
+        
+        // Initial check
+        setTimeout(() => {
+            const chatWindow = document.getElementById('anything-llm-chat');
+            if (chatWindow && chatWindow.style.display !== 'none') {
+                addCloseButton();
+            }
+        }, 1000);
+    }
+    
+    // Start watching when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', watchForChatWindow);
+    } else {
+        watchForChatWindow();
+    }
 })();
 </script>
 </body>
