@@ -399,7 +399,7 @@
                                     class="watson-form-input">
                             </div>
                             <div class="watson-form-row watson-contact-row">
-                                <input type="email" id="email" name="email" placeholder="Email" class="watson-form-input">
+                                <input type="email" id="email" name="email" placeholder="Email" class="watson-form-input" required>
                                 <input type="tel" id="phone" name="phone" placeholder="Phone (xxx) xxx-xxxx"
                                     class="watson-form-input">
                                 <input type="text" id="company" name="company" placeholder="Company"
@@ -635,6 +635,15 @@
                                 phoneField.addEventListener('paste', handlePhonePaste);
                                 console.log('Watson Chat: Phone formatting listener added');
                             }
+                            
+                            // Add asterisks to required field placeholders
+                            const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+                            requiredFields.forEach(field => {
+                                if (field.placeholder && !field.placeholder.includes('*')) {
+                                    field.placeholder = field.placeholder + ' *';
+                                }
+                            });
+                            console.log('Watson Chat: Added asterisks to required fields');
                             
                             // Initial check
                             checkRequiredFields();
@@ -1208,4 +1217,6 @@
  * - December 2024: Removed HTML script tags to create proper JavaScript file
  * - December 2024: Added phone number formatting with support for US and international formats
  * - December 2024: Refactored form validation to dynamically check required attributes instead of hardcoded field IDs
+ * - December 2024: Scoped validation to Watson form only to prevent conflicts with AnythingLLM native fields
+ * - December 2024: Added automatic asterisk addition to required field placeholders via JavaScript
  */

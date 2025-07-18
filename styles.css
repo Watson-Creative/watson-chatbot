@@ -132,6 +132,10 @@
     text-shadow: none;
 }
 
+.watson-form-input[required] {
+    border-color: #00b795;
+}
+
 .watson-form-input:focus {
     outline: none;
     border-color: #00b795 !important;

@@ -58,12 +58,17 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 
 ### 4. **Form-Based Initial Interaction**
 - Custom intake form for first-time visitors
-- Collects: First Name*, Last Name*, Title, Email*, Phone, Company, Message (*Required fields)
+- Flexible field collection - easily customizable by adding/removing `required` attribute
 - Progressive form enablement:
   - Message field is disabled with strikethrough until required fields are filled
   - Submit button is disabled with strikethrough until required fields are filled
-  - Visual indicators for required fields (asterisks and note)
-  - **Dynamic validation**: Any input with the `required` attribute is automatically validated
+  - Visual indicators for required fields:
+    - Automatic asterisk (*) addition to placeholders via JavaScript
+    - Explanatory note at bottom of form
+  - **Dynamic validation**: 
+    - Any input with the `required` attribute is automatically validated
+    - Validation is scoped to Watson form only (ignores AnythingLLM native fields)
+    - No hardcoded field dependencies - truly modular
 - Professional styling with bottom-border design and Roboto Serif font
 - Responsive layout:
   - Desktop: Three inputs per row (Name fields on row 1, Contact info on row 2)
@@ -387,6 +392,9 @@ The JavaScript functionality is organized into three main modules:
 - **Form Creation**: `createIntakeForm()` generates the HTML form
 - **Form Display**: `showIntakeForm()` manages form visibility
 - **Form Validation**: `checkRequiredFields()` monitors required fields and enables/disables elements
+  - Scoped to Watson form only (ignores AnythingLLM native fields)
+  - Automatically handles forms with zero required fields
+- **Automatic Asterisks**: Dynamically adds asterisks to required field placeholders
 - **Form Submission**: `handleFormSubmit()` processes and formats data
 - **Message Formatting**: Sends data as `<first_name>VALUE</first_name>|<last_name>VALUE</last_name>|<title>VALUE</title>|<email>VALUE</email>|<phone>VALUE</phone>|<company>VALUE</company>|<message>VALUE</message>`
 - **Session Management**: Uses sessionStorage to track form submission
@@ -469,6 +477,7 @@ The form fields can be modified in the `createIntakeForm()` function in `script.
 ```javascript
 // Add or remove fields as needed
 // To make a field required, simply add the 'required' attribute
+// Don't include asterisks in placeholders - they're added automatically!
 <input type="text" id="custom-field" name="customField" placeholder="Custom Field" required
     class="watson-form-input">
 
@@ -477,7 +486,12 @@ The form fields can be modified in the `createIntakeForm()` function in `script.
     class="watson-form-input">
 ```
 
-**Note**: The system automatically detects all inputs with the `required` attribute and validates them before enabling the message field and submit button. No JavaScript changes needed when adding/removing required fields!
+**Key Features**:
+- The system automatically detects all inputs with the `required` attribute
+- Asterisks (*) are added to required field placeholders automatically via JavaScript
+- Validation is scoped to the Watson form only - won't conflict with other forms
+- No JavaScript changes needed when adding/removing required fields
+- Works with zero required fields (all inputs enabled immediately)
 
 Update the message format in `handleFormSubmit()`:
 ```javascript
@@ -541,7 +555,7 @@ Key functions in `script.js` that developers may need to modify:
 
 1. **`createIntakeForm()`** - Returns HTML string for the intake form
 2. **`showIntakeForm()`** - Displays the form and hides regular chat input
-3. **`checkRequiredFields()`** - Validates required fields and enables/disables form elements
+3. **`checkRequiredFields()`** - Validates required fields within Watson form only and enables/disables form elements
 4. **`formatPhoneNumber(e)`** - Formats phone numbers as user types
 5. **`handlePhonePaste(e)`** - Handles paste events for phone field with formatting
 6. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
@@ -638,6 +652,13 @@ The addon listens for:
     - Ensure no CSS conflicts with existing stylesheets
     - Check browser developer tools for 404 errors
 
+11. **Asterisks not showing on required fields**
+    - Asterisks are added via JavaScript, not CSS
+    - CSS `::placeholder::after` doesn't work (cannot chain pseudo-elements)
+    - Check console for "Watson Chat: Added asterisks to required fields" message
+    - Ensure the field has the `required` attribute
+    - Asterisks are added when form initializes, not dynamically when attribute changes
+
 ### Debug Mode
 
 The code includes extensive console logging with "Watson Chat:" prefix:
@@ -656,6 +677,9 @@ watsonChatDebug.checkStatus();
 "Watson Chat: Chat window detected as open"
 "Watson Chat: Initializing form interaction"
 "Watson Chat: Showing intake form"
+"Watson Chat: checkRequiredFields called" // Shows required field count and validation status
+"Watson Chat: No required fields found, enabling all" // When no fields are required
+"Watson Chat: Added asterisks to required fields" // When asterisks are added to placeholders
 "Watson Chat: Form submitted"
 "Watson Chat: Message sent successfully"
 "Watson Chat: Form message display updated"
@@ -718,7 +742,14 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 3.2 (Current)
+### Version 3.3 (Current)
+- **Enhanced Form Validation & Asterisk System**:
+  - **Fixed**: Scoped validation to Watson form only - no longer conflicts with AnythingLLM's native required fields
+  - **Added**: Automatic asterisk (*) addition to required field placeholders via JavaScript
+  - **Improved**: Removed need for hardcoded asterisks in HTML - they're added dynamically
+  - **Note**: CSS `::placeholder::after` doesn't work (cannot chain pseudo-elements)
+
+### Version 3.2
 - **Modular Required Field Validation**:
   - Refactored form validation to dynamically check any input with the `required` attribute
   - Removed hardcoded field ID dependencies (firstName, lastName, email)
@@ -798,6 +829,8 @@ This code is proprietary to Watson Creative. All rights reserved.
 - Implemented multiple submission methods for compatibility
 - Added proper event handling for React-based chat widget
 - Improved CSS isolation with specific class targeting
+- **Scoped form validation**: Only validates Watson form fields, preventing conflicts
+- **Dynamic asterisk system**: JavaScript-based solution for required field indicators
 
 ## Support
 
