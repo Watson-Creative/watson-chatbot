@@ -162,7 +162,7 @@
 
 .watson-form-textarea:disabled::placeholder {
     color: #c8c8c8;
-    text-decoration: line-through;
+    /* text-decoration: line-through; */
     text-decoration-color: #9e9e9e;
     text-decoration-thickness: 2px;
 }
@@ -267,8 +267,8 @@
 /* Disabled button styling */
 .allm-start-conversation-button:disabled {
     cursor: not-allowed;
-    opacity: 0.6;
-    text-decoration: line-through;
+    opacity: 0.1 !important;
+    /* text-decoration: line-through; */
     text-decoration-color: #9e9e9e;
     text-decoration-thickness: 2px;
 }
