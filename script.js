@@ -5,10 +5,21 @@
  * 1. Chat bubble popup messages
  * 2. AI disclaimer for chatbot responses
  * 3. Form-based initial interaction system
- * 
- * Last updated: December 2024
+ *
+ * Modification Log:
+ * - Combined three separate scripts into one file
+ * - Added error handling for each module
+ * - Removed HTML script tags to create proper JavaScript file
+ * - Added phone number formatting with support for US and international formats
+ * - Refactored form validation to dynamically check required attributes instead of hardcoded field IDs
+ * - Scoped validation to Watson form only to prevent conflicts with AnythingLLM native fields
+ * - Added automatic asterisk addition to required field placeholders via JavaScript
+ * - Added close button functionality
+ * - Added form message display functionality
+ * - Added debug functions for form state tracking
+ * - Added close button functionality
+ * - Added form message display functionality
  */
-
 (function() {
     'use strict';
     
@@ -1209,14 +1220,3 @@
     console.log('Watson Chat: All enhancement scripts loaded');
     
 })();
-
-/**
- * Modification Log:
- * - December 2024: Combined three separate scripts into one file
- * - December 2024: Added error handling for each module
- * - December 2024: Removed HTML script tags to create proper JavaScript file
- * - December 2024: Added phone number formatting with support for US and international formats
- * - December 2024: Refactored form validation to dynamically check required attributes instead of hardcoded field IDs
- * - December 2024: Scoped validation to Watson form only to prevent conflicts with AnythingLLM native fields
- * - December 2024: Added automatic asterisk addition to required field placeholders via JavaScript
- */
