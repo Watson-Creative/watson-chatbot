@@ -96,7 +96,28 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Maintains chat bubble visibility for easy reopening
 - High z-index to ensure visibility above all chat content
 
-### 6. **Cookie Management**
+### 6. **Browser and Location Data Collection**
+- **Automatic Browser Information**:
+  - User agent string for browser/device identification
+  - Platform information (OS)
+  - Language preferences (primary and all languages)
+  - Cookie enabled status
+  - Device memory and hardware concurrency (when available)
+  - Screen dimensions
+- **IP-Based Location Data**:
+  - Uses ipinfo.io free API (no token required)
+  - Collects: IP address, city, region, country
+  - Approximate coordinates (latitude/longitude)
+  - No user permission prompts required
+  - Graceful fallback if API is unavailable
+- **Privacy Considerations**:
+  - No geolocation API usage (no permission prompts)
+  - Only publicly available information collected
+  - Data sent as hidden XML tags with form submission
+  - Users only see their message content, not technical data
+- **Data Format**: `<browser_user_agent>...</browser_user_agent>|<location_city>...</location_city>` etc.
+
+### 7. **Cookie Management**
 - Optional cookie tracking to limit popup frequency
 - Configurable cookie duration
 - Session-based popup limits
@@ -521,6 +542,57 @@ visibleSpan.textContent = `${emailMatch[1]}: ${messageMatch[1]}`;
 }
 ```
 
+### Customizing Browser/Location Data Collection
+
+You can customize what browser and location data is collected:
+
+1. **Add or remove browser fields** in `getBrowserInfo()`:
+```javascript
+function getBrowserInfo() {
+    return {
+        userAgent: navigator.userAgent || '',
+        platform: navigator.platform || '',
+        // Add more fields:
+        vendor: navigator.vendor || '',
+        onLine: navigator.onLine || false,
+        // Remove fields by commenting out
+    };
+}
+```
+
+2. **Use a different IP geolocation service**:
+```javascript
+async function getLocationInfo() {
+    try {
+        // Example: Using ip-api.com instead
+        const response = await fetch('http://ip-api.com/json/');
+        const data = await response.json();
+        return {
+            ip: data.query || '',
+            city: data.city || '',
+            region: data.regionName || '',
+            country: data.country || '',
+            loc: `${data.lat},${data.lon}` || ''
+        };
+    } catch (err) {
+        // Handle error
+    }
+}
+```
+
+3. **Add an API token for ipinfo.io** (for higher rate limits):
+```javascript
+const response = await fetch('https://ipinfo.io/json?token=YOUR_TOKEN_HERE');
+```
+
+4. **Disable location collection entirely**:
+```javascript
+// In handleFormSubmit, replace:
+const locationInfo = await getLocationInfo();
+// With:
+const locationInfo = { ip: '', city: '', region: '', country: '', loc: '' };
+```
+
 ## API Reference
 
 ### Public Functions
@@ -556,13 +628,16 @@ Key functions in `script.js` that developers may need to modify:
 1. **`createIntakeForm()`** - Returns HTML string for the intake form
 2. **`showIntakeForm()`** - Displays the form and hides regular chat input
 3. **`checkRequiredFields()`** - Validates required fields within Watson form only and enables/disables form elements
-4. **`formatPhoneNumber(e)`** - Formats phone numbers as user types
-5. **`handlePhonePaste(e)`** - Handles paste events for phone field with formatting
-6. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
-7. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
-8. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
-9. **`watchForResetButton()`** - Detects and handles chat reset button clicks
-10. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
+4. **`getBrowserInfo()`** - Collects browser information synchronously
+5. **`getLocationInfo()`** - Fetches IP-based location data asynchronously from ipinfo.io
+6. **`formatHiddenData(browserInfo, locationInfo)`** - Formats browser/location data as XML tags
+7. **`formatPhoneNumber(e)`** - Formats phone numbers as user types
+8. **`handlePhonePaste(e)`** - Handles paste events for phone field with formatting
+9. **`handleFormSubmit(e)`** - Async function that processes form submission, collects browser/location data, and sends to LLM
+10. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
+11. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display (hides technical data)
+12. **`watchForResetButton()`** - Detects and handles chat reset button clicks
+13. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
 
 ### Events
 
@@ -659,6 +734,19 @@ The addon listens for:
     - Ensure the field has the `required` attribute
     - Asterisks are added when form initializes, not dynamically when attribute changes
 
+12. **Browser/Location data not being collected**
+    - Check console for "Watson Chat: Browser info collected" and "Watson Chat: Location info collected"
+    - Verify ipinfo.io API is accessible (not blocked by firewall/ad blocker)
+    - Check for CORS errors in browser console
+    - Location data collection is async - ensure form submission waits for it
+    - Test with `watsonChatDebug.checkStatus()` to see full formatted message
+
+13. **Hidden data visible to users**
+    - Ensure `watchForFormMessages()` is running and processing messages
+    - Check that message contains expected XML tags pattern
+    - Verify CSS class `watson-processed` is being added to prevent reprocessing
+    - Hidden data should only be in the actual message sent to LLM, not displayed
+
 ### Debug Mode
 
 The code includes extensive console logging with "Watson Chat:" prefix:
@@ -742,7 +830,20 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 3.3 (Current)
+### Version 3.4 (Current)
+- **Browser and Location Information Collection**:
+  - **Added**: Automatic browser information collection (no user prompts):
+    - User agent, platform, language settings
+    - Cookie status, device memory, hardware concurrency
+    - Screen dimensions
+  - **Added**: IP-based location collection via ipinfo.io API:
+    - IP address, city, region, country
+    - Approximate coordinates (latitude/longitude)
+  - **Enhanced**: Form submission now includes hidden browser/location data
+  - **Privacy**: No permission prompts - uses only publicly available information
+  - **Format**: Data appended as XML-style tags, hidden from user view
+
+### Version 3.3
 - **Enhanced Form Validation & Asterisk System**:
   - **Fixed**: Scoped validation to Watson form only - no longer conflicts with AnythingLLM's native required fields
   - **Added**: Automatic asterisk (*) addition to required field placeholders via JavaScript
@@ -831,6 +932,9 @@ This code is proprietary to Watson Creative. All rights reserved.
 - Improved CSS isolation with specific class targeting
 - **Scoped form validation**: Only validates Watson form fields, preventing conflicts
 - **Dynamic asterisk system**: JavaScript-based solution for required field indicators
+- **Privacy-focused data collection**: Browser and location info without permission prompts
+- **Async form submission**: Handles location API calls gracefully
+- **Hidden data architecture**: Technical data sent to LLM but hidden from user view
 
 ## Support
 

@@ -482,6 +482,66 @@
                 }
             }
 
+            // Function to collect browser information
+            function getBrowserInfo() {
+                return {
+                    userAgent: navigator.userAgent || '',
+                    platform: navigator.platform || '',
+                    language: navigator.language || '',
+                    languages: (navigator.languages || []).join(', '),
+                    cookieEnabled: navigator.cookieEnabled || false,
+                    deviceMemory: navigator.deviceMemory || '',
+                    hardwareConcurrency: navigator.hardwareConcurrency || '',
+                    screenWidth: window.screen.width || '',
+                    screenHeight: window.screen.height || ''
+                };
+            }
+            
+            // Function to get IP-based location info
+            async function getLocationInfo() {
+                try {
+                    // Using ipinfo.io free tier (no token needed for basic info)
+                    const response = await fetch('https://ipinfo.io/json');
+                    const data = await response.json();
+                    return {
+                        ip: data.ip || '',
+                        city: data.city || '',
+                        region: data.region || '',
+                        country: data.country || '',
+                        loc: data.loc || '' // latitude,longitude as string
+                    };
+                } catch (err) {
+                    console.log('Watson Chat: Could not fetch location info:', err);
+                    return {
+                        ip: '',
+                        city: '',
+                        region: '',
+                        country: '',
+                        loc: ''
+                    };
+                }
+            }
+            
+            // Function to format hidden data as XML-style tags
+            function formatHiddenData(browserInfo, locationInfo) {
+                return [
+                    `<browser_user_agent>${browserInfo.userAgent}</browser_user_agent>`,
+                    `<browser_platform>${browserInfo.platform}</browser_platform>`,
+                    `<browser_language>${browserInfo.language}</browser_language>`,
+                    `<browser_languages>${browserInfo.languages}</browser_languages>`,
+                    `<browser_cookie_enabled>${browserInfo.cookieEnabled}</browser_cookie_enabled>`,
+                    `<browser_device_memory>${browserInfo.deviceMemory}</browser_device_memory>`,
+                    `<browser_hardware_concurrency>${browserInfo.hardwareConcurrency}</browser_hardware_concurrency>`,
+                    `<browser_screen_width>${browserInfo.screenWidth}</browser_screen_width>`,
+                    `<browser_screen_height>${browserInfo.screenHeight}</browser_screen_height>`,
+                    `<location_ip>${locationInfo.ip}</location_ip>`,
+                    `<location_city>${locationInfo.city}</location_city>`,
+                    `<location_region>${locationInfo.region}</location_region>`,
+                    `<location_country>${locationInfo.country}</location_country>`,
+                    `<location_coords>${locationInfo.loc}</location_coords>`
+                ].join('|');
+            }
+
             // Function to format phone number as user types
             function formatPhoneNumber(e) {
                 const input = e.target;
@@ -616,7 +676,10 @@
                         
                         // Add form submission handler if not already added
                         if (!form.hasAttribute('data-listener-added')) {
-                            form.addEventListener('submit', handleFormSubmit, false);
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                handleFormSubmit(e);
+                            }, false);
                             form.setAttribute('data-listener-added', 'true');
                             console.log('Watson Chat: Form submission handler added');
                             
@@ -664,7 +727,7 @@
             }
 
             // Function to handle form submission
-            function handleFormSubmit(e) {
+            async function handleFormSubmit(e) {
                 if (e && e.preventDefault) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -692,9 +755,23 @@
                     firstName, lastName, title, email, phone, company, message
                 });
 
-                // Format the message according to the specified format
-                const formattedMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<title>${title}</title>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<message>${message}</message>`;
-                console.log('Watson Chat: Formatted message:', formattedMessage);
+                // Collect browser information (synchronous)
+                const browserInfo = getBrowserInfo();
+                console.log('Watson Chat: Browser info collected:', browserInfo);
+
+                // Collect location information (asynchronous)
+                const locationInfo = await getLocationInfo();
+                console.log('Watson Chat: Location info collected:', locationInfo);
+
+                // Format the main message
+                const mainMessage = `<first_name>${firstName}</first_name>|<last_name>${lastName}</last_name>|<title>${title}</title>|<email>${email}</email>|<phone>${phone}</phone>|<company>${company}</company>|<message>${message}</message>`;
+                
+                // Format hidden data
+                const hiddenData = formatHiddenData(browserInfo, locationInfo);
+                
+                // Combine both
+                const formattedMessage = `${mainMessage}|${hiddenData}`;
+                console.log('Watson Chat: Full formatted message with hidden data:', formattedMessage);
 
                 // First, show the original message input (it needs to be visible to work)
                 const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
@@ -1135,7 +1212,7 @@
                     
                     userMessages.forEach(p => {
                         const text = p.textContent;
-                        // Check if this is a form submission message
+                        // Check if this is a form submission message (contains both form data and possibly browser/location data)
                         if (text.includes('<first_name>') && text.includes('<message>') && !p.classList.contains('watson-processed')) {
                             // Extract the message content
                             const messageMatch = text.match(/<message>(.*?)<\/message>/);
@@ -1154,7 +1231,7 @@
                                 p.innerHTML = '';
                                 p.appendChild(visibleSpan);
                                 
-                                console.log('Watson Chat: Form message display updated');
+                                console.log('Watson Chat: Form message display updated, hidden data preserved for LLM');
                             }
                         }
                     });
