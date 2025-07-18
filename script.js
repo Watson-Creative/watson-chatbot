@@ -393,17 +393,14 @@
                     <div id="watson-intake-form" class="allm-flex">
                         <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
                             <div class="watson-form-row watson-name-row">
-                                <input type="text" id="first-name" name="firstName" placeholder="First Name *" required
-                                    class="watson-form-input watson-required">
-                                <input type="text" id="last-name" name="lastName" placeholder="Last Name *" required
-                                    class="watson-form-input watson-required">
+                                <input type="text" id="first-name" name="firstName" placeholder="First Name" class="watson-form-input">
+                                <input type="text" id="last-name" name="lastName" placeholder="Last Name" class="watson-form-input">
                                 <input type="text" id="title" name="title" placeholder="Title"
                                     class="watson-form-input">
                             </div>
                             <div class="watson-form-row watson-contact-row">
-                                <input type="email" id="email" name="email" placeholder="Email *" required
-                                    class="watson-form-input watson-required">
-                                <input type="tel" id="phone" name="phone" placeholder="Phone"
+                                <input type="email" id="email" name="email" placeholder="Email" class="watson-form-input">
+                                <input type="tel" id="phone" name="phone" placeholder="Phone (xxx) xxx-xxxx"
                                     class="watson-form-input">
                                 <input type="text" id="company" name="company" placeholder="Company"
                                     class="watson-form-input">
@@ -424,17 +421,41 @@
 
             // Function to check if required fields are filled
             function checkRequiredFields() {
-                const firstName = document.getElementById('first-name');
-                const lastName = document.getElementById('last-name');
-                const email = document.getElementById('email');
-                const messageField = document.getElementById('message');
-                const submitButton = document.querySelector('.allm-start-conversation-button');
+                // Only check required fields within our custom form
+                const watsonForm = document.getElementById('watson-contact-form');
+                if (!watsonForm) {
+                    console.log('Watson Chat: Watson form not found');
+                    return;
+                }
                 
-                if (firstName && lastName && email && messageField && submitButton) {
-                    const allFilled = firstName.value.trim() !== '' && 
-                                    lastName.value.trim() !== '' && 
-                                    email.value.trim() !== '' &&
-                                    email.validity.valid;
+                const requiredInputs = watsonForm.querySelectorAll('input[required], textarea[required]');
+                const messageField = document.getElementById('message');
+                const submitButton = watsonForm.querySelector('.allm-start-conversation-button');
+                
+                console.log('Watson Chat: checkRequiredFields called', {
+                    requiredInputsCount: requiredInputs.length,
+                    messageFieldFound: !!messageField,
+                    submitButtonFound: !!submitButton
+                });
+                
+                if (messageField && submitButton) {
+                    // If there are no required fields, enable everything
+                    if (requiredInputs.length === 0) {
+                        console.log('Watson Chat: No required fields found, enabling all');
+                        messageField.disabled = false;
+                        messageField.placeholder = "Tell us about your project...";
+                        submitButton.disabled = false;
+                        return;
+                    }
+                    
+                    // Check if all required fields are filled
+                    const allFilled = Array.from(requiredInputs).every(input => {
+                        const isFilled = input.value.trim() !== '' && input.validity.valid;
+                        console.log(`Watson Chat: Checking ${input.name || input.id}: ${isFilled}`);
+                        return isFilled;
+                    });
+                    
+                    console.log('Watson Chat: All required fields filled:', allFilled);
                     
                     if (allFilled) {
                         messageField.disabled = false;
@@ -445,6 +466,8 @@
                         messageField.placeholder = "Tell us about your project...";
                         submitButton.disabled = true;
                     }
+                } else {
+                    console.log('Watson Chat: Message field or submit button not found');
                 }
             }
 
@@ -597,13 +620,13 @@
                                 console.log('Watson Chat: Button click handler added');
                             }
                             
-                            // Add input listeners for required fields
-                            const requiredFields = form.querySelectorAll('.watson-required');
-                            requiredFields.forEach(field => {
+                            // Add input listeners for all fields to handle dynamic requirements
+                            const allInputs = form.querySelectorAll('input, textarea');
+                            allInputs.forEach(field => {
                                 field.addEventListener('input', checkRequiredFields);
                                 field.addEventListener('blur', checkRequiredFields);
                             });
-                            console.log('Watson Chat: Required field listeners added');
+                            console.log('Watson Chat: Field listeners added for', allInputs.length, 'fields');
                             
                             // Add phone formatting listener
                             const phoneField = document.getElementById('phone');
@@ -1184,4 +1207,5 @@
  * - December 2024: Added error handling for each module
  * - December 2024: Removed HTML script tags to create proper JavaScript file
  * - December 2024: Added phone number formatting with support for US and international formats
+ * - December 2024: Refactored form validation to dynamically check required attributes instead of hardcoded field IDs
  */

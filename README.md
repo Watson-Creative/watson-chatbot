@@ -63,6 +63,7 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
   - Message field is disabled with strikethrough until required fields are filled
   - Submit button is disabled with strikethrough until required fields are filled
   - Visual indicators for required fields (asterisks and note)
+  - **Dynamic validation**: Any input with the `required` attribute is automatically validated
 - Professional styling with bottom-border design and Roboto Serif font
 - Responsive layout:
   - Desktop: Three inputs per row (Name fields on row 1, Contact info on row 2)
@@ -467,9 +468,16 @@ The form fields can be modified in the `createIntakeForm()` function in `script.
 
 ```javascript
 // Add or remove fields as needed
-<input type="text" id="custom-field" name="customField" placeholder="Custom Field"
+// To make a field required, simply add the 'required' attribute
+<input type="text" id="custom-field" name="customField" placeholder="Custom Field" required
+    class="watson-form-input">
+
+// For optional fields, omit the 'required' attribute
+<input type="text" id="optional-field" name="optionalField" placeholder="Optional Field"
     class="watson-form-input">
 ```
+
+**Note**: The system automatically detects all inputs with the `required` attribute and validates them before enabling the message field and submit button. No JavaScript changes needed when adding/removing required fields!
 
 Update the message format in `handleFormSubmit()`:
 ```javascript
@@ -710,7 +718,18 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 3.1 (Current)
+### Version 3.2 (Current)
+- **Modular Required Field Validation**:
+  - Refactored form validation to dynamically check any input with the `required` attribute
+  - Removed hardcoded field ID dependencies (firstName, lastName, email)
+  - System now automatically detects and validates all required fields
+  - Allows easy form customization by simply adding/removing `required` attribute
+  - More flexible and maintainable approach for changing form fields on the fly
+  - **Fixed**: Properly handles forms with no required fields - enables all inputs immediately
+  - **Enhanced**: Added event listeners to all form fields for better dynamic handling
+  - **Added**: Comprehensive debugging logs to track validation behavior
+
+### Version 3.1
 - **Phone Number Formatting Enhancement**:
   - Added automatic phone number formatting as user types
   - Supports standard US format: `(xxx) xxx-xxxx`
