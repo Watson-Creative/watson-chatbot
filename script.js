@@ -69,8 +69,38 @@
                 "Ready to turn curiosity into clarity?",
                 "Let's talk about what matters.",
                 "What's your vision? Let's make it real.",
-                "Every transformation starts here."
-            ];
+                "Every transformation starts here.",
+                "Let’s spark your next big idea.",
+                "Curious about the future of your brand?",
+                "Start the conversation that makes a difference.",
+                "What does success look like for you?",
+                "Let’s reimagine what’s possible.",
+                "Have a project in mind? We’re all ears.",
+                "Your next breakthrough could be one message away.",
+                "Let’s turn challenges into opportunities.",
+                "Ready to level up your brand?",
+                "Tell us about your goals—big or small.",
+                "Great brands are built on bold questions.",
+                "What's the story only you can tell?",
+                "Every bold move starts with a conversation.",
+                "What’s standing between you and growth?",
+                "What will tomorrow look like for your business?",
+                "Let’s build something extraordinary.",
+                "Stuck on a problem? Let’s solve it together.",
+                "Every brand deserves a breakthrough moment.",
+                "Let’s turn ideas into action.",
+                "How can we help you stand out?",
+                "Ready to challenge the status quo?",
+                "What's possible when we work together?",
+                "Let’s bring your vision to life.",
+                "Start shaping the future of your brand now.",
+                "Share your challenges—let’s find solutions.",
+                "What’s the first step toward your next win?",
+                "Let’s create something remarkable.",
+                "Got a wild idea? We love those.",
+                "Let’s find clarity in the chaos.",
+                "Big dreams? Let’s make them real."
+            ];           
 
             // Session counter for tracking popups shown this session
             let popupsShownThisSession = 0;
