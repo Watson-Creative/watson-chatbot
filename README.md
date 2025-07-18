@@ -75,6 +75,11 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Intelligent message display - shows only user message while preserving full data for LLM
 - Automatic form state reset with "Reset Chat" button
 - Robust form submission handling with multiple fallback methods
+- **Phone Number Formatting**:
+  - Auto-formats as user types to `(xxx) xxx-xxxx` format
+  - Supports international format: `+x (xxx) xxx-xxxx` for numbers with country codes
+  - Handles paste events with automatic formatting
+  - Preserves cursor position during formatting
 
 ### 5. **Custom Close Button**
 - Circular close button positioned in top-right corner of chat window
@@ -529,11 +534,13 @@ Key functions in `script.js` that developers may need to modify:
 1. **`createIntakeForm()`** - Returns HTML string for the intake form
 2. **`showIntakeForm()`** - Displays the form and hides regular chat input
 3. **`checkRequiredFields()`** - Validates required fields and enables/disables form elements
-4. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
-5. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
-6. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
-7. **`watchForResetButton()`** - Detects and handles chat reset button clicks
-8. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
+4. **`formatPhoneNumber(e)`** - Formats phone numbers as user types
+5. **`handlePhonePaste(e)`** - Handles paste events for phone field with formatting
+6. **`handleFormSubmit(e)`** - Processes form submission and sends to LLM
+7. **`sendFormattedMessage(message)`** - Handles the actual message sending with multiple fallback methods
+8. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display
+9. **`watchForResetButton()`** - Detects and handles chat reset button clicks
+10. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
 
 ### Events
 
@@ -703,7 +710,16 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 3.0 (Current)
+### Version 3.1 (Current)
+- **Phone Number Formatting Enhancement**:
+  - Added automatic phone number formatting as user types
+  - Supports standard US format: `(xxx) xxx-xxxx`
+  - Supports international format with country codes: `+x (xxx) xxx-xxxx`
+  - Handles paste events with automatic formatting
+  - Preserves cursor position during formatting for better UX
+  - Updated placeholder text to show expected format
+
+### Version 3.0
 - **Major Refactoring - File Separation**:
   - Separated all JavaScript code into `script.js` file
   - Moved all CSS styles into `styles.css` file

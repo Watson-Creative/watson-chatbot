@@ -448,6 +448,73 @@
                 }
             }
 
+            // Function to format phone number as user types
+            function formatPhoneNumber(e) {
+                const input = e.target;
+                let value = input.value.replace(/\D/g, ''); // Remove all non-digits
+                
+                // Check if it starts with a country code (assuming 1-3 digits)
+                let formattedValue = '';
+                let hasCountryCode = false;
+                
+                // Check for country code patterns
+                if (value.length > 10) {
+                    // Assume first 1-3 digits are country code if total length > 10
+                    const possibleCountryCodeLength = value.length - 10;
+                    if (possibleCountryCodeLength >= 1 && possibleCountryCodeLength <= 3) {
+                        const countryCode = value.substring(0, possibleCountryCodeLength);
+                        const phoneNumber = value.substring(possibleCountryCodeLength);
+                        
+                        // Format with country code
+                        if (phoneNumber.length >= 6) {
+                            formattedValue = `+${countryCode} (${phoneNumber.substring(0, 3)}) ${phoneNumber.substring(3, 6)}`;
+                            if (phoneNumber.length > 6) {
+                                formattedValue += `-${phoneNumber.substring(6, 10)}`;
+                            }
+                        } else if (phoneNumber.length >= 3) {
+                            formattedValue = `+${countryCode} (${phoneNumber.substring(0, 3)}) ${phoneNumber.substring(3)}`;
+                        } else {
+                            formattedValue = `+${countryCode} (${phoneNumber}`;
+                        }
+                        hasCountryCode = true;
+                    }
+                }
+                
+                // Format without country code
+                if (!hasCountryCode) {
+                    if (value.length >= 6) {
+                        formattedValue = `(${value.substring(0, 3)}) ${value.substring(3, 6)}`;
+                        if (value.length > 6) {
+                            formattedValue += `-${value.substring(6, 10)}`;
+                        }
+                    } else if (value.length >= 3) {
+                        formattedValue = `(${value.substring(0, 3)}) ${value.substring(3)}`;
+                    } else if (value.length > 0) {
+                        formattedValue = `(${value}`;
+                    }
+                }
+                
+                // Update the input value
+                input.value = formattedValue;
+                
+                // Preserve cursor position
+                const cursorPosition = input.selectionStart;
+                setTimeout(() => {
+                    input.setSelectionRange(cursorPosition, cursorPosition);
+                }, 0);
+            }
+            
+            // Function to handle paste events for phone numbers
+            function handlePhonePaste(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const input = e.target;
+                
+                // Clean the pasted text and trigger formatting
+                input.value = pastedText.replace(/\D/g, '');
+                formatPhoneNumber({ target: input });
+            }
+
             // Function to hide the message input area and show the form
             function showIntakeForm() {
                 // Find the chat container
@@ -537,6 +604,14 @@
                                 field.addEventListener('blur', checkRequiredFields);
                             });
                             console.log('Watson Chat: Required field listeners added');
+                            
+                            // Add phone formatting listener
+                            const phoneField = document.getElementById('phone');
+                            if (phoneField) {
+                                phoneField.addEventListener('input', formatPhoneNumber);
+                                phoneField.addEventListener('paste', handlePhonePaste);
+                                console.log('Watson Chat: Phone formatting listener added');
+                            }
                             
                             // Initial check
                             checkRequiredFields();
@@ -1108,4 +1183,5 @@
  * - December 2024: Combined three separate scripts into one file
  * - December 2024: Added error handling for each module
  * - December 2024: Removed HTML script tags to create proper JavaScript file
+ * - December 2024: Added phone number formatting with support for US and international formats
  */
