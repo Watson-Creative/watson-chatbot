@@ -1136,10 +1136,16 @@
                     const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
                     
                     greetingContainers.forEach(container => {
-                        // Check if this contains our greeting text and hasn't been processed
-                        if (container.textContent.includes('Got a big vision?') && 
-                            container.textContent.includes("Let's talk about how Watson Creative can bring it to life.") &&
-                            !container.classList.contains('watson-greeting-processed')) {
+                        // Check if this contains our greeting text (either plain or with HTML tags) and hasn't been processed
+                        const textContent = container.textContent;
+                        const hasGreeting = textContent.includes('Got a big vision?') && 
+                                          textContent.includes("Let's talk about how Watson Creative can bring it to life.");
+                        
+                        // Also check if it has the escaped HTML version (simplified check)
+                        const hasHTMLGreeting = textContent.includes('<h1>Got a big vision?</h1>') && 
+                                               textContent.includes('<h2>Let');
+                        
+                        if ((hasGreeting || hasHTMLGreeting) && !container.classList.contains('watson-greeting-processed')) {
                             
                             // Mark as processed to avoid duplicate processing
                             container.classList.add('watson-greeting-processed');
@@ -1166,9 +1172,13 @@
                 setTimeout(() => {
                     const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
                     greetingContainers.forEach(container => {
-                        if (container.textContent.includes('Got a big vision?') && 
-                            container.textContent.includes("Let's talk about how Watson Creative can bring it to life.") &&
-                            !container.classList.contains('watson-greeting-processed')) {
+                        const textContent = container.textContent;
+                        const hasGreeting = textContent.includes('Got a big vision?') && 
+                                          textContent.includes("Let's talk about how Watson Creative can bring it to life.");
+                        const hasHTMLGreeting = textContent.includes('<h1>Got a big vision?</h1>') && 
+                                               textContent.includes('<h2>Let');
+                        
+                        if ((hasGreeting || hasHTMLGreeting) && !container.classList.contains('watson-greeting-processed')) {
                             
                             container.classList.add('watson-greeting-processed');
                             container.innerHTML = `
