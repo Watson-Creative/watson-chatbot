@@ -122,6 +122,13 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - Configurable cookie duration
 - Session-based popup limits
 
+### 8. **HTML Greeting Formatting**
+- Automatically converts plain text greeting into HTML structure
+- Detects greeting text and replaces with properly formatted h1/h2 tags
+- Custom styling for greeting headers with Roboto Serif font
+- MutationObserver monitors for greeting appearance
+- Prevents duplicate processing with class marking
+
 ## File Structure
 
 The Watson Creative Chatbot Addon is now organized into separate files for better maintainability:
@@ -638,6 +645,7 @@ Key functions in `script.js` that developers may need to modify:
 11. **`watchForFormMessages()`** - Monitors chat for form submissions and modifies display (hides technical data)
 12. **`watchForResetButton()`** - Detects and handles chat reset button clicks
 13. **`initializeFormInteraction()`** - Main initialization function with duplicate prevention
+14. **`replaceGreetingWithHTML()`** - Converts plain text greeting to HTML h1/h2 structure
 
 ### Events
 
@@ -747,6 +755,13 @@ The addon listens for:
     - Verify CSS class `watson-processed` is being added to prevent reprocessing
     - Hidden data should only be in the actual message sent to LLM, not displayed
 
+14. **Greeting showing as plain text instead of HTML**
+    - Check console for "Watson Chat: Greeting replaced with HTML formatting" message
+    - Verify the greeting text matches exactly what's in the JavaScript
+    - Ensure MutationObserver is running (check for errors in console)
+    - Confirm CSS styles for `.watson-greeting-h1` and `.watson-greeting-h2` are loaded
+    - Check that greeting container has expected AnythingLLM classes
+
 ### Debug Mode
 
 The code includes extensive console logging with "Watson Chat:" prefix:
@@ -830,7 +845,15 @@ This code is proprietary to Watson Creative. All rights reserved.
 
 ## Recent Updates
 
-### Version 3.4 (Current)
+### Version 3.5 (Current)
+- **HTML Greeting Formatting**:
+  - **Added**: Automatic conversion of plain text greeting to HTML structure
+  - **Enhanced**: Greeting now displays as formatted h1 and h2 elements
+  - **Implemented**: MutationObserver to detect and replace greeting text
+  - **Styled**: Custom CSS for greeting headers with proper typography
+  - **Solution**: Works around AnythingLLM's HTML escaping in data attributes
+
+### Version 3.4
 - **Browser and Location Information Collection**:
   - **Added**: Automatic browser information collection (no user prompts):
     - User agent, platform, language settings

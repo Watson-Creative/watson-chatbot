@@ -1128,6 +1128,63 @@
             // Start watching for reset button
             watchForResetButton();
             
+            // ===== CUSTOM GREETING HTML FUNCTIONALITY =====
+            // Function to replace greeting text with HTML
+            function replaceGreetingWithHTML() {
+                const observer = new MutationObserver((mutations) => {
+                    // Look for the greeting text container
+                    const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
+                    
+                    greetingContainers.forEach(container => {
+                        // Check if this contains our greeting text and hasn't been processed
+                        if (container.textContent.includes('Got a big vision?') && 
+                            container.textContent.includes("Let's talk about how Watson Creative can bring it to life.") &&
+                            !container.classList.contains('watson-greeting-processed')) {
+                            
+                            // Mark as processed to avoid duplicate processing
+                            container.classList.add('watson-greeting-processed');
+                            
+                            // Replace with HTML structure
+                            container.innerHTML = `
+                                <h1 class="watson-greeting-h1">Got a big vision?</h1>
+                                <h2 class="watson-greeting-h2">Let's talk about how Watson Creative can bring it to life.</h2>
+                            `;
+                            
+                            console.log('Watson Chat: Greeting replaced with HTML formatting');
+                        }
+                    });
+                });
+                
+                // Start observing
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    characterData: true
+                });
+                
+                // Also check immediately in case greeting already exists
+                setTimeout(() => {
+                    const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
+                    greetingContainers.forEach(container => {
+                        if (container.textContent.includes('Got a big vision?') && 
+                            container.textContent.includes("Let's talk about how Watson Creative can bring it to life.") &&
+                            !container.classList.contains('watson-greeting-processed')) {
+                            
+                            container.classList.add('watson-greeting-processed');
+                            container.innerHTML = `
+                                <h1 class="watson-greeting-h1">Got a big vision?</h1>
+                                <h2 class="watson-greeting-h2">Let's talk about how Watson Creative can bring it to life.</h2>
+                            `;
+                            
+                            console.log('Watson Chat: Greeting replaced with HTML formatting (immediate check)');
+                        }
+                    });
+                }, 100);
+            }
+            
+            // Start watching for greeting to replace
+            replaceGreetingWithHTML();
+            
             // ===== CUSTOM CLOSE BUTTON FUNCTIONALITY =====
             let closeButton = null;
             
