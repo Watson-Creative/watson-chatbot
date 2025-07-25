@@ -1,0 +1,19 @@
+{
+  "name": "watson-chatbot-minifier",
+  "version": "1.0.0",
+  "description": "Build script for minifying Watson Creative chatbot CSS and JS files",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "install-deps": "npm install"
+  },
+  "keywords": ["minify", "build", "watson", "chatbot"],
+  "author": "Watson Creative",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "uglify-js": "^3.17.4",
+    "chokidar": "^3.5.3"
+  }
+} 
