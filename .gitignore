@@ -24,4 +24,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Build outputs (uncomment these lines if you don't want to commit minified files)
+# *.min.js
+# *.min.css
+
+# Additional OS files
+Thumbs.db
+
 
