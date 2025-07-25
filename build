@@ -1,7 +1,8 @@
 #!/bin/bash
-
-# Convert stars.svg to a base64-encoded data URI and save to stars.b64.txt
+clear;
 {
   echo -n 'data:image/svg+xml;base64,'
   base64 -i stars.svg
-} > stars.b64.txt
+} > stars.b64.txt;
+npm run build;
+echo "✨ ✨ ✨ ✨ ✨ ✨";
