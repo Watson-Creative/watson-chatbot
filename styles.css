@@ -376,3 +376,23 @@
 	margin: 0;
 	text-align: center;
 }
+
+/* Watson greeting header with logo */
+.watson-greeting-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-bottom: 0.5rem;
+}
+
+.watson-greeting-logo {
+	height: 32px;
+	width: auto;
+	flex-shrink: 0;
+}
+
+/* Update H1 to remove its own margin when in header */
+.watson-greeting-header .watson-greeting-h1 {
+	margin: 0;
+}
