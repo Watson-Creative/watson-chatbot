@@ -70,6 +70,30 @@
     fill: #f5fcfb !important;
     stroke: #f5fcfb !important;
 }
+
+/* Custom stars icon for chat button */
+#anything-llm-embed-chat-button svg {
+    /* Hide the original icon */
+    opacity: 0 !important;
+}
+
+#anything-llm-embed-chat-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background-image: url('./stars.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+    /* Make the icon white to match the existing color scheme */
+    filter: brightness(0) invert(1);
+}
 #anything-llm-chat {
     min-height: calc(100%-20px) !important;
     height: calc(100%-20px) !important;
