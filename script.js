@@ -1151,10 +1151,7 @@
                             container.classList.add('watson-greeting-processed');
                             
                             // Replace with HTML structure
-                            container.innerHTML = `
-                                <h1 class="watson-greeting-h1">Start Exploring</h1>
-                                <p class="watson-greeting-h2">This AI has all the intel on Watson—from case studies to trail recommendations.<br/><em>Yes, we have a Slack thread dedicated to the best backcountry snacks.</em></p>
-                            `;
+                            container.innerHTML = `<h1 class="watson-greeting-h1">Start Exploring</h1><p class="watson-greeting-h2">This AI has all the intel on Watson—from case studies to trail recommendations.<br/><em>Yes, we have a Slack thread dedicated to the best backcountry snacks.</em></p>`;
                             
                             console.log('Watson Chat: Greeting replaced with HTML formatting');
                         }
