@@ -1129,33 +1129,42 @@
             watchForResetButton();
             
             // ===== CUSTOM GREETING HTML FUNCTIONALITY =====
+            // Function to check and replace greeting text
+            function processGreetingContainer(container) {
+                // Check if container has already been processed
+                if (container.classList.contains('watson-greeting-processed')) {
+                    return false;
+                }
+                
+                // Check if this is a greeting container (any text content will do)
+                // The widget will place whatever is in data-greeting here
+                const hasContent = container.textContent.trim().length > 0;
+                
+                if (hasContent) {
+                    // Mark as processed to avoid duplicate processing
+                    container.classList.add('watson-greeting-processed');
+                    
+                    // Replace with HTML structure
+                    container.innerHTML = '<h1 class="watson-greeting-h1">Start Exploring</h1><p class="watson-greeting-h2">This AI has all the intel on Watson—from case studies to trail recommendations.<br/><em>Yes, we have a Slack thread dedicated to the best backcountry snacks.</em></p>';
+                    
+                    console.log('Watson Chat: Greeting replaced with HTML formatting');
+                    return true;
+                }
+                
+                return false;
+            }
+            
             // Function to replace greeting text with HTML
             function replaceGreetingWithHTML() {
-                const observer = new MutationObserver((mutations) => {
-                    // Look for the greeting text container
+                // Check for greeting containers
+                function checkForGreeting() {
                     const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
-                    
-                    greetingContainers.forEach(container => {
-                        // Check if this contains our greeting text (either plain or with HTML tags) and hasn't been processed
-                        const textContent = container.textContent;
-                        const hasGreeting = textContent.includes('Got a big vision?') && 
-                                          textContent.includes("Let's talk about how Watson Creative can bring it to life.");
-                        
-                        // Also check if it has the escaped HTML version (simplified check)
-                        const hasHTMLGreeting = textContent.includes('<h1>Got a big vision?</h1>') && 
-                                               textContent.includes('<h2>Let');
-                        
-                        if ((hasGreeting || hasHTMLGreeting) && !container.classList.contains('watson-greeting-processed')) {
-                            
-                            // Mark as processed to avoid duplicate processing
-                            container.classList.add('watson-greeting-processed');
-                            
-                            // Replace with HTML structure
-                            container.innerHTML = '<h1 class="watson-greeting-h1">Start Exploring</h1><p class="watson-greeting-h2">This AI has all the intel on Watson—from case studies to trail recommendations.<br/><em>Yes, we have a Slack thread dedicated to the best backcountry snacks.</em></p>';
-                            
-                            console.log('Watson Chat: Greeting replaced with HTML formatting');
-                        }
-                    });
+                    greetingContainers.forEach(processGreetingContainer);
+                }
+                
+                // Set up observer for dynamic content
+                const observer = new MutationObserver((mutations) => {
+                    checkForGreeting();
                 });
                 
                 // Start observing
@@ -1166,24 +1175,7 @@
                 });
                 
                 // Also check immediately in case greeting already exists
-                setTimeout(() => {
-                    const greetingContainers = document.querySelectorAll('.allm-text-slate-400.allm-text-sm.allm-font-sans.allm-py-4.allm-text-center');
-                    greetingContainers.forEach(container => {
-                        const textContent = container.textContent;
-                        const hasGreeting = textContent.includes('Got a big vision?') && 
-                                          textContent.includes("Let's talk about how Watson Creative can bring it to life.");
-                        const hasHTMLGreeting = textContent.includes('<h1>Got a big vision?</h1>') && 
-                                               textContent.includes('<h2>Let');
-                        
-                        if ((hasGreeting || hasHTMLGreeting) && !container.classList.contains('watson-greeting-processed')) {
-                            
-                            container.classList.add('watson-greeting-processed');
-                            container.innerHTML = '<h1 class="watson-greeting-h1">Start Exploring</h1><p class="watson-greeting-h2">This AI has all the intel on Watson—from case studies to trail recommendations.<br/><em>Yes, we have a Slack thread dedicated to the best backcountry snacks.</em></p>';
-                            
-                            console.log('Watson Chat: Greeting replaced with HTML formatting (immediate check)');
-                        }
-                    });
-                }, 100);
+                setTimeout(checkForGreeting, 100);
             }
             
             // Start watching for greeting to replace
