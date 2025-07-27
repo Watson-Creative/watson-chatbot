@@ -399,3 +399,18 @@
 .watson-greeting-header .watson-greeting-h1 {
 	margin: 0;
 }
+
+/* Default (desktop) */
+#anything-llm-embed-chat-button-container {
+    margin: 0px 0px 20px 48px !important;
+    padding: 0 !important;
+  }
+  
+  /* Mobile (max-width: 600px or adjust as needed) */
+  @media (max-width: 600px) {
+    #anything-llm-embed-chat-button-container {
+      margin: 0px 0px 10px 10px !important;
+      padding: 0 !important;
+    }
+  }
+  
