@@ -79,6 +79,10 @@
     opacity: 0 !important;
 }
 
+button#anything-llm-embed-chat-button::hover {
+        background-color: rgb(9, 124, 103) !important;
+}
+
 #anything-llm-embed-chat-button::after {
     content: '';
     position: absolute;
