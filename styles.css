@@ -241,10 +241,7 @@ button#anything-llm-embed-chat-button::hover {
     .watson-greeting-h1 {
         font-size: 1.5rem;
     }
-    
-    .watson-greeting-h2 {
-        /* font-size: 1rem !important; */
-    }
+
 }
 
 /* Desktop specific - ensure rows stay horizontal */
