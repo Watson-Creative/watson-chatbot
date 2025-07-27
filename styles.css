@@ -16,7 +16,9 @@
     border-radius: 0 0 2px 0;
     z-index: -1;
 }
-
+#watson-chat-popup div span {
+    color: #022822 !important;
+}
 /* Custom close button styling */
 .watson-close-button {
     /* Basic styling for the button itself */
