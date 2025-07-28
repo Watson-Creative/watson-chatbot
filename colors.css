@@ -3,6 +3,7 @@
     --text-light: #404040;
     --greywc: #82736f;
     --light-gray-2: #707070;
+    --true-white: #ffffff;
     --off-white: #f0edec;
     --white: #f4f2f1;
     --cloud: #f4f2f1;
@@ -14,22 +15,4 @@
     --redwood: #e93826;
     --larch: #fdb71a;
     --sunset: #f58020;
-    --site-width: 1360px;
-    --default-border-radius: 10px;
-    --negative-margin-global: -30px;
-    --negative-mobile-margin: -10px;
-    --site-max-width: 2550px;
-    --site-desktop-pad: 30px;
-    --site-mobile-pad: 10px;
-    --animated-gallery-img-height-small: 420px;
-    --h2-big-font-size: 3.2rem;
-    --h2-big-mobile-font-size: 2.5rem;
-    --h2-line-height: 1.15em;
-    --animated-gallery-img-width: 450px;
-    --animated-gallery-img-height: 480px;
-    --animated-gallery-img-width-small: 50vw;
-    --first-section-top-margin: 70px;
-    --first-section-mobile-top-margin: 90px;
-    --global-section-margin: 80px;
-    --global-section-margin-mobile: 60px;
 }
