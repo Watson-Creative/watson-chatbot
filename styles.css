@@ -22,7 +22,7 @@
 /* Custom close button styling */
 .watson-close-button {
     /* Basic styling for the button itself */
-    background-color: var(--midnight); 
+    background-color: var(--glacial); 
     border: none;
     cursor: pointer;
     padding: 0;
@@ -391,7 +391,7 @@ button#anything-llm-embed-chat-button::hover {
 }
 
 .watson-greeting-logo {
-	height: 32px;
+	height: 18px;
 	width: auto;
 	flex-shrink: 0;
 }
