@@ -66,6 +66,10 @@
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 /* Force chat icon color to var(--white) */
+#anything-llm-embed-chat-button {
+    transition: background-color 0.3s ease;
+}
+
 #anything-llm-embed-chat-button svg,
 #anything-llm-embed-chat-button svg path,
 #anything-llm-embed-chat-button svg * {
@@ -95,10 +99,12 @@
     pointer-events: none;
     z-index: 1;
     filter: brightness(0%) invert(100%);
+    transition: filter 6s ease-out;
 }
 
 #anything-llm-embed-chat-button:hover {
-    background-color: var(--midnight) !important;
+    background-color: var(--forest) !important;
+    transition: background-color 3s ease-in-out;
 }
 
 #anything-llm-embed-chat-button:hover::after {
