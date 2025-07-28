@@ -79,10 +79,6 @@
     opacity: 0 !important;
 }
 
-button#anything-llm-embed-chat-button::hover {
-        background-color: rgb(9, 124, 103) !important;
-}
-
 #anything-llm-embed-chat-button::after {
     content: '';
     position: absolute;
@@ -98,9 +94,17 @@ button#anything-llm-embed-chat-button::hover {
     background-position: center;
     pointer-events: none;
     z-index: 1;
-    /* Make the icon white to match the existing color scheme */
-    filter: brightness(0) invert(1);
+    filter: brightness(0%) invert(100%);
 }
+
+#anything-llm-embed-chat-button:hover {
+    background-color: var(--midnight) !important;
+}
+
+#anything-llm-embed-chat-button:hover::after {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(75%) saturate(300%) hue-rotate(100deg) brightness(125%) contrast(125%);
+}
+
 #anything-llm-chat {
     min-height: calc(100%-20px) !important;
     height: calc(100%-20px) !important;
