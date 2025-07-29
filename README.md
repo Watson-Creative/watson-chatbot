@@ -129,6 +129,22 @@ This chatbot addon integrates the AnythingLLM chat widget into your website with
 - MutationObserver monitors for greeting appearance
 - Prevents duplicate processing with class marking
 
+### 9. **Custom Stars Icon**
+- Replaces default chat button icon with animated stars design
+- Uses base64-encoded SVG for performance (no external file dependency)
+- Animated stars with 3-second transition effects
+- Hover effects with color transformations
+- Maintains accessibility with proper ARIA labels
+- Icon files included: `stars.svg`, `stars.b64.txt` for reference
+
+### 10. **Build System & Minification**
+- Node.js-based build system for production optimization
+- Automatic JavaScript and CSS minification
+- Build ID generation for cache busting
+- Watch mode for development workflow
+- Size reduction: ~65% for JS, ~22% for CSS
+- Preserves debugging capabilities in minified versions
+
 ## File Structure
 
 The Watson Creative Chatbot Addon is now organized into separate files for better maintainability:
@@ -137,7 +153,16 @@ The Watson Creative Chatbot Addon is now organized into separate files for bette
 watson-chatbot/
 ├── script.js        # Combined JavaScript functionality
 ├── styles.css       # All CSS styles
+├── colors.css       # CSS color variables and brand colors
 ├── index.html       # Main HTML file
+├── build.js         # Build system for minification
+├── package.json     # Node.js dependencies for build system
+├── README-BUILD.md  # Build system documentation
+├── stars.svg        # Animated stars icon for chat button
+├── stars.b64.txt    # Base64 encoded stars icon
+├── watson-chat-icon.ai # Original AI file for chat icon
+├── watson-creative-mark-light-green.svg # Watson Creative logo
+├── anythingllm-chat-widget.min.js # Minified AnythingLLM widget
 └── README.md        # Documentation
 ```
 
@@ -154,6 +179,61 @@ watson-chatbot/
   - Close button styling
   - Responsive design rules
   - Z-index management
+
+- **colors.css**: Contains Watson Creative brand color variables:
+  - CSS custom properties for consistent theming
+  - Brand colors: midnight, glacial, forest, etc.
+  - Text colors and background colors
+  - Used throughout the application for consistent styling
+
+- **build.js**: Node.js build system for minifying JavaScript and CSS files
+- **package.json**: Dependencies for the build system (terser, clean-css-cli)
+- **README-BUILD.md**: Documentation for the build system and minification process
+
+## Color Scheme & Brand Variables
+
+The application uses a comprehensive color system defined in `colors.css`:
+
+### Primary Brand Colors
+```css
+:root {
+    --text: #040504;              /* Primary text color */
+    --text-light: #404040;        /* Secondary text color */
+    --midnight: #022822;          /* Dark green - primary brand color */
+    --forest: #0c4b41;            /* Medium green - secondary brand color */
+    --glacial: #00b795;           /* Bright green - accent color */
+    --light-green: #92d0c3;       /* Light green - subtle accents */
+}
+```
+
+### Supporting Colors
+```css
+:root {
+    --greywc: #82736f;            /* Watson Creative grey */
+    --light-gray-2: #707070;      /* Light grey for disabled states */
+    --true-white: #ffffff;        /* Pure white */
+    --off-white: #f0edec;         /* Off-white background */
+    --white: #f4f2f1;             /* Primary white */
+    --cloud: #f4f2f1;             /* Cloud background color */
+    --forest-glacial-mid: #06816b; /* Mid-tone green */
+}
+```
+
+### Accent Colors
+```css
+:root {
+    --redwood: #e93826;           /* Red accent */
+    --larch: #fdb71a;             /* Yellow accent */
+    --sunset: #f58020;            /* Orange accent */
+}
+```
+
+### Usage in Components
+- **Chat Button**: Uses `var(--glacial)` for background, `var(--white)` for icon
+- **Close Button**: Uses `var(--glacial)` for background, `var(--white)` for X icon
+- **Form Inputs**: Use `var(--midnight)` for borders, `var(--glacial)` for focus states
+- **Text**: Uses `var(--text)` for primary text, `var(--text-light)` for secondary
+- **Greeting**: Uses `var(--midnight)` with text shadow for brand consistency
 
 ## Installation
 
@@ -210,6 +290,36 @@ watson-chatbot/
 3. **Ensure file paths are correct** based on your project structure.
 
 4. **Note**: The AnythingLLM widget script (`anythingllm-chat-widget.min.js`) should be loaded before `script.js` to ensure the widget is available when the enhancement scripts initialize.
+
+### Using Minified Files (Recommended for Production)
+
+For production use, the project includes a build system that creates minified versions:
+
+```html
+<!-- Use minified versions for production -->
+<link rel="stylesheet" href="styles.min.css">
+<script src="script.min.js"></script>
+```
+
+**Build System Setup:**
+```bash
+# Install dependencies
+npm install
+
+# Build minified files once
+npm run build
+
+# Watch for changes and auto-rebuild
+npm run watch
+```
+
+**Build Output:**
+- `script.min.js` - Minified JavaScript (24KB vs 68KB original)
+- `styles.min.css` - Minified CSS (14KB vs 18KB original)
+- Includes build IDs and timestamps for cache busting
+- Preserves debugging capabilities and global functions
+
+See `README-BUILD.md` for detailed build system documentation.
 
 ## Configuration
 
@@ -400,7 +510,18 @@ All styles are now consolidated in the `styles.css` file:
   - Positioned absolutely at top: 10px, right: 10px
   - Z-index of 100000001 to ensure visibility
 
-### 2. **JavaScript Components (script.js)**
+### 3. **Custom Stars Icon Styling**
+- **Icon Replacement**: Original chat button icon hidden with `opacity: 0`
+- **Base64 SVG**: Stars icon embedded as base64 data URL for performance
+- **Animation**: 3-second transition with `filter: brightness(0%) invert(100%)`
+- **Hover Effects**: 
+  - Background color changes to `var(--forest)` then `var(--midnight)`
+  - Icon filter transforms to green hue with brightness adjustments
+  - Smooth 1-second transition for background color
+- **Accessibility**: Maintains proper ARIA labels and keyboard navigation
+- **Performance**: No external file requests, all data embedded in CSS
+
+### 4. **JavaScript Components (script.js)**
 
 The JavaScript functionality is organized into three main modules:
 
@@ -600,6 +721,46 @@ const locationInfo = await getLocationInfo();
 const locationInfo = { ip: '', city: '', region: '', country: '', loc: '' };
 ```
 
+### Customizing the Build System
+
+The build system can be customized in `build.js`:
+
+1. **Modify build configuration**:
+```javascript
+// In build.js, customize these settings:
+const config = {
+    jsSource: './script.js',
+    cssSource: './styles.css',
+    jsOutput: './script.min.js',
+    cssOutput: './styles.min.css',
+    // Add custom options
+    preserveComments: true,
+    mangle: false
+};
+```
+
+2. **Add custom build tasks**:
+```javascript
+// Add to package.json scripts:
+"build:dev": "node build.js --dev",
+"build:prod": "node build.js --production",
+"build:analyze": "node build.js --analyze"
+```
+
+3. **Customize minification settings**:
+```javascript
+// In build.js, modify terser options:
+const terserOptions = {
+    compress: {
+        drop_console: false,  // Keep console.log for debugging
+        drop_debugger: true
+    },
+    mangle: {
+        reserved: ['watsonChatDebug']  // Preserve global debug object
+    }
+};
+```
+
 ## API Reference
 
 ### Public Functions
@@ -761,6 +922,35 @@ The addon listens for:
     - Ensure MutationObserver is running (check for errors in console)
     - Confirm CSS styles for `.watson-greeting-h1` and `.watson-greeting-h2` are loaded
     - Check that greeting container has expected AnythingLLM classes
+
+15. **Build system not working**
+    - Ensure Node.js is installed (version 14+ recommended)
+    - Run `npm install` to install dependencies
+    - Check that `package.json` exists and has correct scripts
+    - Verify `build.js` file exists and is executable
+    - Look for error messages in build output
+    - Ensure source files (`script.js`, `styles.css`) exist before building
+
+16. **Minified files not loading**
+    - Verify minified files were created (`script.min.js`, `styles.min.css`)
+    - Check file paths in HTML match actual file locations
+    - Ensure minified files have proper permissions
+    - Look for 404 errors in browser developer tools
+    - Try rebuilding with `npm run build`
+
+17. **Stars icon not displaying**
+    - Check that `colors.css` is loaded before `styles.css`
+    - Verify CSS variables are defined and accessible
+    - Look for console errors related to base64 image loading
+    - Ensure the original chat button icon is being hidden properly
+    - Check that the stars SVG is properly encoded in the CSS
+
+18. **Color scheme not applying correctly**
+    - Ensure `colors.css` is included in HTML before `styles.css`
+    - Verify CSS custom properties are defined in `:root`
+    - Check browser support for CSS custom properties
+    - Look for CSS conflicts with existing stylesheets
+    - Test with `getComputedStyle()` to verify variable values
 
 ### Debug Mode
 
@@ -940,24 +1130,39 @@ This code is proprietary to Watson Creative. All rights reserved.
 - Enhanced error handling and fallback mechanisms
 - Updated message format to use XML-style tags for better parsing
 
+### Version 1.0
+- **Build System Implementation**:
+  - **Added**: Node.js-based build system for production optimization
+  - **Implemented**: Automatic JavaScript and CSS minification
+  - **Added**: Build ID generation and timestamp for cache busting
+  - **Created**: Watch mode for development workflow
+  - **Enhanced**: Size reduction of ~65% for JS, ~22% for CSS
+  - **Preserved**: Debugging capabilities in minified versions
+  - **Added**: `build.js`, `package.json`, `README-BUILD.md` for build system
+  - **Created**: Minified files: `script.min.js`, `styles.min.css`
+
 ### Key Technical Improvements
 - **File Organization**: Separated code into logical files for better maintainability
 - **Error Isolation**: Each module wrapped in try-catch blocks
 - **Enhanced Logging**: Comprehensive console logging for debugging
 - **Modular Structure**: Three independent scripts combined safely
-- CSS organization: All styles now in single location for better maintainability
-- Responsive design with mobile-first approach
-- Professional form styling with Roboto Serif font
-- Prevented duplicate form initialization
-- Added MutationObserver for dynamic content monitoring
-- Implemented multiple submission methods for compatibility
-- Added proper event handling for React-based chat widget
-- Improved CSS isolation with specific class targeting
+- **CSS organization**: All styles now in single location for better maintainability
+- **Responsive design**: Mobile-first approach with proper breakpoints
+- **Professional form styling**: Roboto Serif font with brand colors
+- **Prevented duplicate form initialization**: Proper state management
+- **Added MutationObserver**: Dynamic content monitoring for real-time updates
+- **Implemented multiple submission methods**: Compatibility with React-based chat widget
+- **Added proper event handling**: React compatibility for form submission
+- **Improved CSS isolation**: Specific class targeting to prevent conflicts
 - **Scoped form validation**: Only validates Watson form fields, preventing conflicts
 - **Dynamic asterisk system**: JavaScript-based solution for required field indicators
 - **Privacy-focused data collection**: Browser and location info without permission prompts
 - **Async form submission**: Handles location API calls gracefully
 - **Hidden data architecture**: Technical data sent to LLM but hidden from user view
+- **Build system optimization**: Production-ready minification with debugging preservation
+- **Color system implementation**: CSS custom properties for consistent theming
+- **Custom icon system**: Base64-encoded SVG for performance and reliability
+- **HTML greeting formatting**: Automatic conversion of plain text to structured HTML
 
 ## Support
 
