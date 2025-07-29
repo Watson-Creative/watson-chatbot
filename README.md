@@ -321,6 +321,54 @@ npm run watch
 
 See `README-BUILD.md` for detailed build system documentation.
 
+### Using GitHack CDN (Alternative Hosting)
+
+For projects that need to host files from a Git repository, you can use [raw.githack.com](https://raw.githack.com) as a CDN proxy. This service provides two types of URLs:
+
+#### Production CDN URLs (Recommended for Live Sites)
+```html
+<!-- Production URLs - cached for 1 year -->
+<link rel="stylesheet" href="https://rawcdn.githack.com/Watson-Creative/watson-chatbot/refs/heads/master/styles.min.css">
+<script src="https://rawcdn.githack.com/Watson-Creative/watson-chatbot/refs/heads/master/script.min.js"></script>
+```
+
+#### Development URLs (For Testing Only)
+```html
+<!-- Development URLs - cached for a few minutes -->
+<link rel="stylesheet" href="https://raw.githack.com/Watson-Creative/watson-chatbot/refs/heads/master/styles.min.css">
+<script src="https://raw.githack.com/Watson-Creative/watson-chatbot/refs/heads/master/script.min.js"></script>
+```
+
+#### When to Use Each Type
+
+**Use Production CDN URLs when:**
+- Deploying to live websites with public traffic
+- You want maximum performance and reliability
+- Files are stable and won't change frequently
+- You need the best caching and load times
+
+**Use Development URLs when:**
+- Testing changes during development
+- Sharing temporary demos or prototypes
+- You need to see updates within a few minutes
+- Traffic is low and freshness is more important than performance
+
+**Important Notes:**
+- Production URLs are cached for **1 year** - changes won't be visible until you update the URL
+- Development URLs are cached for only a few minutes but may be slower
+- For production sites, always use CDN URLs to avoid excessive load on the service
+- If you need to update a production URL, use a git tag or commit hash instead of branch names
+- The service is free and provides no uptime guarantees - consider self-hosting for critical applications
+
+#### Supported Git Services
+- GitHub (including Gist)
+- Bitbucket
+- GitLab
+- Gitea
+- Codeberg
+
+For more information, visit [raw.githack.com](https://raw.githack.com).
+
 ## Configuration
 
 ### Script Organization
@@ -946,224 +994,4 @@ The addon listens for:
     - Check that the stars SVG is properly encoded in the CSS
 
 18. **Color scheme not applying correctly**
-    - Ensure `colors.css` is included in HTML before `styles.css`
-    - Verify CSS custom properties are defined in `:root`
-    - Check browser support for CSS custom properties
-    - Look for CSS conflicts with existing stylesheets
-    - Test with `getComputedStyle()` to verify variable values
-
-### Debug Mode
-
-The code includes extensive console logging with "Watson Chat:" prefix:
-
-```javascript
-// Check form system status
-watsonChatDebug.checkStatus();
-
-// Common debug logs to look for:
-"Watson Chat: Enhancement scripts loading..."
-"Watson Chat: Popup functionality loaded"
-"Watson Chat: Disclaimer functionality loaded"
-"Watson Chat: Form functionality loaded"
-"Watson Chat: All enhancement scripts loaded"
-"Watson Chat: Starting to watch for chat window"
-"Watson Chat: Chat window detected as open"
-"Watson Chat: Initializing form interaction"
-"Watson Chat: Showing intake form"
-"Watson Chat: checkRequiredFields called" // Shows required field count and validation status
-"Watson Chat: No required fields found, enabling all" // When no fields are required
-"Watson Chat: Added asterisks to required fields" // When asterisks are added to placeholders
-"Watson Chat: Form submitted"
-"Watson Chat: Message sent successfully"
-"Watson Chat: Form message display updated"
-
-// Enable additional logging by modifying the code:
-console.log('Watson Chat: Custom debug message', variableToInspect);
-```
-
-### Form Submission Flow
-
-Understanding the submission process for debugging:
-
-1. **Form Submit** → `handleFormSubmit()` called
-2. **Data Collection** → Form data extracted and formatted
-3. **UI Switch** → Original form shown, intake form hidden
-4. **Wait for Input** → Polls for message input availability
-5. **Send Message** → Multiple methods attempted:
-   - Native value setter for React compatibility
-   - Form submission event
-   - Button click event
-   - Enter key simulation
-6. **Display Update** → `watchForFormMessages()` modifies display
-
-### Performance Considerations
-
-- MutationObserver runs on every DOM change
-- Fallback interval runs every second
-- Consider reducing `MAX_POPUPS_PER_SESSION` for better performance
-- Optimize `popupMessages` array size
-
-## AnythingLLM Development Notes
-
-### Local Development Setup
-If you need to modify the AnythingLLM widget itself:
-
-1. Clone the AnythingLLM embed repository
-2. Navigate to the embed directory: `cd anythingllm-embed-main`
-3. Install dependencies: `yarn`
-4. Start development server: `yarn dev`
-5. Build for production: `yarn build`
-
-The built widget will be available at `anythingllm-chat-widget.min.js`.
-
-### Widget File Structure
-- `src/App.jsx` - Main application component
-- `src/components/ChatWindow/` - Chat interface components
-- `src/hooks/` - Custom React hooks for chat functionality
-- `src/models/chatService.js` - API communication logic
-- `src/locales/` - Internationalization files
-
-### Important Files for Customization
-- `src/components/ChatWindow/Header/index.jsx` - Chat header customization
-- `src/components/ChatWindow/ChatContainer/PromptInput/index.jsx` - Input field behavior
-- `src/components/OpenButton/index.jsx` - Chat bubble button
-- `src/index.css` - Global styles
-
-## License
-
-This code is proprietary to Watson Creative. All rights reserved.
-
-## Recent Updates
-
-### Version 3.5 (Current)
-- **HTML Greeting Formatting**:
-  - **Added**: Automatic conversion of plain text greeting to HTML structure
-  - **Enhanced**: Greeting now displays as formatted h1 and h2 elements
-  - **Implemented**: MutationObserver to detect and replace greeting text
-  - **Styled**: Custom CSS for greeting headers with proper typography
-  - **Solution**: Works around AnythingLLM's HTML escaping in data attributes
-
-### Version 3.4
-- **Browser and Location Information Collection**:
-  - **Added**: Automatic browser information collection (no user prompts):
-    - User agent, platform, language settings
-    - Cookie status, device memory, hardware concurrency
-    - Screen dimensions
-  - **Added**: IP-based location collection via ipinfo.io API:
-    - IP address, city, region, country
-    - Approximate coordinates (latitude/longitude)
-  - **Enhanced**: Form submission now includes hidden browser/location data
-  - **Privacy**: No permission prompts - uses only publicly available information
-  - **Format**: Data appended as XML-style tags, hidden from user view
-
-### Version 3.3
-- **Enhanced Form Validation & Asterisk System**:
-  - **Fixed**: Scoped validation to Watson form only - no longer conflicts with AnythingLLM's native required fields
-  - **Added**: Automatic asterisk (*) addition to required field placeholders via JavaScript
-  - **Improved**: Removed need for hardcoded asterisks in HTML - they're added dynamically
-  - **Note**: CSS `::placeholder::after` doesn't work (cannot chain pseudo-elements)
-
-### Version 3.2
-- **Modular Required Field Validation**:
-  - Refactored form validation to dynamically check any input with the `required` attribute
-  - Removed hardcoded field ID dependencies (firstName, lastName, email)
-  - System now automatically detects and validates all required fields
-  - Allows easy form customization by simply adding/removing `required` attribute
-  - More flexible and maintainable approach for changing form fields on the fly
-  - **Fixed**: Properly handles forms with no required fields - enables all inputs immediately
-  - **Enhanced**: Added event listeners to all form fields for better dynamic handling
-  - **Added**: Comprehensive debugging logs to track validation behavior
-
-### Version 3.1
-- **Phone Number Formatting Enhancement**:
-  - Added automatic phone number formatting as user types
-  - Supports standard US format: `(xxx) xxx-xxxx`
-  - Supports international format with country codes: `+x (xxx) xxx-xxxx`
-  - Handles paste events with automatic formatting
-  - Preserves cursor position during formatting for better UX
-  - Updated placeholder text to show expected format
-
-### Version 3.0
-- **Major Refactoring - File Separation**:
-  - Separated all JavaScript code into `script.js` file
-  - Moved all CSS styles into `styles.css` file
-  - Improved code organization and maintainability
-  - Added master IIFE wrapper with error handling for each module
-  - Removed all HTML script tags from JavaScript file
-  - Added comprehensive logging for debugging
-  - Maintained all existing functionality while improving structure
-
-### Version 2.3
-- **Custom Close Button Addition**:
-  - Added custom close button to top-right corner of chat window
-  - Implemented circular design with dark green background (#022822)
-  - Created white X icon using CSS pseudo-elements
-  - Integrated with native "Close Chat" functionality for consistent behavior
-  - Added automatic button appearance when chat opens
-  - Implemented proper state management and cleanup
-  - Ensured chat bubble remains visible after closing (matching native behavior)
-
-### Version 2.2
-- **Progressive Form Validation Updates**:
-  - Implemented required field validation for First Name, Last Name, and Email
-  - Added progressive form enablement - message field and submit button disabled until required fields are filled
-  - Added strikethrough effect for disabled elements
-  - Enhanced visual feedback with asterisks for required fields
-  - Added explanatory note: "* Required fields must be filled before starting a conversation"
-  - Updated form container styling with centered layout and proper spacing
-
-### Version 2.1
-- **Form Enhancement Updates**:
-  - Added Title field to the intake form
-  - Redesigned form layout with responsive rows
-  - Implemented professional bottom-border input styling
-  - Added custom "Start Conversation" button with animated underline
-  - Integrated Watson Creative arrow icon with hover animation
-  - **IMPORTANT**: Consolidated all CSS into single `<style>` tag (removed JavaScript style injection)
-
-### Version 2.0
-- Added custom intake form for lead capture
-- Implemented intelligent message display (shows only message content to users)
-- Added session-based form management with reset functionality
-- Improved form submission handling with React compatibility
-- Added comprehensive debugging tools via `watsonChatDebug`
-- Enhanced error handling and fallback mechanisms
-- Updated message format to use XML-style tags for better parsing
-
-### Version 1.0
-- **Build System Implementation**:
-  - **Added**: Node.js-based build system for production optimization
-  - **Implemented**: Automatic JavaScript and CSS minification
-  - **Added**: Build ID generation and timestamp for cache busting
-  - **Created**: Watch mode for development workflow
-  - **Enhanced**: Size reduction of ~65% for JS, ~22% for CSS
-  - **Preserved**: Debugging capabilities in minified versions
-  - **Added**: `build.js`, `package.json`, `README-BUILD.md` for build system
-  - **Created**: Minified files: `script.min.js`, `styles.min.css`
-
-### Key Technical Improvements
-- **File Organization**: Separated code into logical files for better maintainability
-- **Error Isolation**: Each module wrapped in try-catch blocks
-- **Enhanced Logging**: Comprehensive console logging for debugging
-- **Modular Structure**: Three independent scripts combined safely
-- **CSS organization**: All styles now in single location for better maintainability
-- **Responsive design**: Mobile-first approach with proper breakpoints
-- **Professional form styling**: Roboto Serif font with brand colors
-- **Prevented duplicate form initialization**: Proper state management
-- **Added MutationObserver**: Dynamic content monitoring for real-time updates
-- **Implemented multiple submission methods**: Compatibility with React-based chat widget
-- **Added proper event handling**: React compatibility for form submission
-- **Improved CSS isolation**: Specific class targeting to prevent conflicts
-- **Scoped form validation**: Only validates Watson form fields, preventing conflicts
-- **Dynamic asterisk system**: JavaScript-based solution for required field indicators
-- **Privacy-focused data collection**: Browser and location info without permission prompts
-- **Async form submission**: Handles location API calls gracefully
-- **Hidden data architecture**: Technical data sent to LLM but hidden from user view
-- **Build system optimization**: Production-ready minification with debugging preservation
-- **Color system implementation**: CSS custom properties for consistent theming
-- **Custom icon system**: Base64-encoded SVG for performance and reliability
-- **HTML greeting formatting**: Automatic conversion of plain text to structured HTML
-
-## Support
-
-For support, contact: hello@watsoncreative.com
+    - Ensure `colors.css`
