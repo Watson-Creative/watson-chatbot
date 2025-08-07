@@ -45,6 +45,9 @@
     };
     // Note: Browser and location information is always collected in the background
     
+    // Message placeholder text (single source of truth)
+    const MESSAGE_PLACEHOLDER_DEFAULT = "Have a question? Want to know our process? Curious how we can help? Ask us anything.";
+    
     // ========================================
     // SCRIPT 1: Chat Bubble Popup Functionality
     // ========================================
@@ -487,7 +490,7 @@
                     const hasOtherFields = Object.keys(FORM_FIELDS).some(key => key !== 'message' && FORM_FIELDS[key]);
                     const disabled = hasOtherFields ? 'disabled' : '';
                     messageHTML = `
-                            <textarea id="message" name="message" placeholder="Have a question? Want to know our process? Curious how we can help? Ask us anything." rows="3" class="watson-form-input watson-form-textarea" ${disabled}></textarea>`;
+                            <textarea id="message" name="message" placeholder="${MESSAGE_PLACEHOLDER_DEFAULT}" rows="3" class="watson-form-input watson-form-textarea" ${disabled}></textarea>`;
                 }
                 
                 // Check if we need the required note
@@ -539,7 +542,7 @@
                     if (requiredInputs.length === 0) {
                         console.log('Watson Chat: No required fields found, enabling all');
                         messageField.disabled = false;
-                        messageField.placeholder = "Have a question? Want to know our process? Curious how we can help? Ask us anything.";
+                        messageField.placeholder = MESSAGE_PLACEHOLDER_DEFAULT;
                         submitButton.disabled = false;
                         return;
                     }
