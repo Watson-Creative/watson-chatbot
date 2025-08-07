@@ -31,7 +31,19 @@
     // Toggle the intake form functionality on/off
     // true  = Show the custom intake form when chat opens
     // false = Disable the form completely and use the standard chat interface
-    const FORM_ACTIVE = true; // Currently DISABLED - set to true to enable
+    const FORM_ACTIVE = true; // Currently ENABLED - set to false to disable
+    
+    // Form field configuration - toggle individual fields on/off
+    const FORM_FIELDS = {
+        firstName: false,    // First Name field
+        lastName: false,     // Last Name field  
+        title: false,        // Title field
+        email: false,        // Email field (was required)
+        phone: false,        // Phone field
+        company: false,      // Company field
+        message: true        // Message field (kept enabled)
+    };
+    // Note: Browser and location information is always collected in the background
     
     // ========================================
     // SCRIPT 1: Chat Bubble Popup Functionality
@@ -424,30 +436,81 @@
 
             // Function to create the intake form
             function createIntakeForm() {
+                // Build form rows dynamically based on configuration
+                let nameRowFields = [];
+                let contactRowFields = [];
+                
+                // Name row fields
+                if (FORM_FIELDS.firstName) {
+                    nameRowFields.push('<input type="text" id="first-name" name="firstName" placeholder="First Name" class="watson-form-input">');
+                }
+                if (FORM_FIELDS.lastName) {
+                    nameRowFields.push('<input type="text" id="last-name" name="lastName" placeholder="Last Name" class="watson-form-input">');
+                }
+                if (FORM_FIELDS.title) {
+                    nameRowFields.push('<input type="text" id="title" name="title" placeholder="Title" class="watson-form-input">');
+                }
+                
+                // Contact row fields
+                if (FORM_FIELDS.email) {
+                    contactRowFields.push('<input type="email" id="email" name="email" placeholder="Email" class="watson-form-input" required>');
+                }
+                if (FORM_FIELDS.phone) {
+                    contactRowFields.push('<input type="tel" id="phone" name="phone" placeholder="Phone (xxx) xxx-xxxx" class="watson-form-input">');
+                }
+                if (FORM_FIELDS.company) {
+                    contactRowFields.push('<input type="text" id="company" name="company" placeholder="Company" class="watson-form-input">');
+                }
+                
+                // Build the name row HTML (only if there are fields)
+                let nameRowHTML = '';
+                if (nameRowFields.length > 0) {
+                    nameRowHTML = `
+                            <div class="watson-form-row watson-name-row">
+                                ${nameRowFields.join('\n                                ')}
+                            </div>`;
+                }
+                
+                // Build the contact row HTML (only if there are fields)
+                let contactRowHTML = '';
+                if (contactRowFields.length > 0) {
+                    contactRowHTML = `
+                            <div class="watson-form-row watson-contact-row">
+                                ${contactRowFields.join('\n                                ')}
+                            </div>`;
+                }
+                
+                // Build message field HTML (only if enabled)
+                let messageHTML = '';
+                if (FORM_FIELDS.message) {
+                    // Check if any other fields exist to determine if message should be disabled initially
+                    const hasOtherFields = Object.keys(FORM_FIELDS).some(key => key !== 'message' && FORM_FIELDS[key]);
+                    const disabled = hasOtherFields ? 'disabled' : '';
+                    messageHTML = `
+                            <textarea id="message" name="message" placeholder="Tell us about your project..."
+                                rows="3"
+                                class="watson-form-input watson-form-textarea" ${disabled}></textarea>`;
+                }
+                
+                // Check if we need the required note
+                const hasRequiredFields = FORM_FIELDS.email; // Only email was marked as required
+                const requiredNote = hasRequiredFields ? 
+                    '<p class="watson-required-note">* Required fields must be filled before starting a conversation.</p>' : '';
+                
+                // Check if button should be disabled (only if there are required fields that need to be filled)
+                const buttonDisabled = hasRequiredFields ? 'disabled' : '';
+                
                 const formHTML = `
                     <div id="watson-intake-form" class="allm-flex">
                         <form id="watson-contact-form" class="allm-flex allm-flex-col allm-gap-y-3" onsubmit="return false;">
-                            <div class="watson-form-row watson-name-row">
-                                <input type="text" id="first-name" name="firstName" placeholder="First Name" class="watson-form-input">
-                                <input type="text" id="last-name" name="lastName" placeholder="Last Name" class="watson-form-input">
-                                <input type="text" id="title" name="title" placeholder="Title"
-                                    class="watson-form-input">
-                            </div>
-                            <div class="watson-form-row watson-contact-row">
-                                <input type="email" id="email" name="email" placeholder="Email" class="watson-form-input" required>
-                                <input type="tel" id="phone" name="phone" placeholder="Phone (xxx) xxx-xxxx"
-                                    class="watson-form-input">
-                                <input type="text" id="company" name="company" placeholder="Company"
-                                    class="watson-form-input">
-                            </div>
-                            <textarea id="message" name="message" placeholder="Tell us about your project..."
-                                rows="3"
-                                class="watson-form-input watson-form-textarea" disabled></textarea>
+                            ${nameRowHTML}
+                            ${contactRowHTML}
+                            ${messageHTML}
                             <button type="submit" 
-                                class="allm-start-conversation-button" disabled>
+                                class="allm-start-conversation-button" ${buttonDisabled}>
                                 Start Conversation
                             </button>
-                            <p class="watson-required-note">* Required fields must be filled before starting a conversation.</p>
+                            ${requiredNote}
                         </form>
                     </div>
                 `;
@@ -732,12 +795,14 @@
                             });
                             console.log('Watson Chat: Field listeners added for', allInputs.length, 'fields');
                             
-                            // Add phone formatting listener
-                            const phoneField = document.getElementById('phone');
-                            if (phoneField) {
-                                phoneField.addEventListener('input', formatPhoneNumber);
-                                phoneField.addEventListener('paste', handlePhonePaste);
-                                console.log('Watson Chat: Phone formatting listener added');
+                            // Add phone formatting listener (only if phone field is enabled)
+                            if (FORM_FIELDS.phone) {
+                                const phoneField = document.getElementById('phone');
+                                if (phoneField) {
+                                    phoneField.addEventListener('input', formatPhoneNumber);
+                                    phoneField.addEventListener('paste', handlePhonePaste);
+                                    console.log('Watson Chat: Phone formatting listener added');
+                                }
                             }
                             
                             // Add asterisks to required field placeholders
@@ -773,23 +838,24 @@
                 }
                 
                 const formData = new FormData(form);
-                const firstName = formData.get('firstName') || '';
-                const lastName = formData.get('lastName') || '';
-                const title = formData.get('title') || '';
-                const email = formData.get('email') || '';
-                const phone = formData.get('phone') || '';
-                const company = formData.get('company') || '';
-                const message = formData.get('message') || '';
+                // Get values only if fields exist (based on configuration)
+                const firstName = FORM_FIELDS.firstName ? (formData.get('firstName') || '') : '';
+                const lastName = FORM_FIELDS.lastName ? (formData.get('lastName') || '') : '';
+                const title = FORM_FIELDS.title ? (formData.get('title') || '') : '';
+                const email = FORM_FIELDS.email ? (formData.get('email') || '') : '';
+                const phone = FORM_FIELDS.phone ? (formData.get('phone') || '') : '';
+                const company = FORM_FIELDS.company ? (formData.get('company') || '') : '';
+                const message = FORM_FIELDS.message ? (formData.get('message') || '') : '';
 
                 console.log('Watson Chat: Form data collected:', {
                     firstName, lastName, title, email, phone, company, message
                 });
 
-                // Collect browser information (synchronous)
+                // ALWAYS collect browser information regardless of form fields shown (synchronous)
                 const browserInfo = getBrowserInfo();
                 console.log('Watson Chat: Browser info collected:', browserInfo);
 
-                // Collect location information (asynchronous)
+                // ALWAYS collect location information regardless of form fields shown (asynchronous)
                 const locationInfo = await getLocationInfo();
                 console.log('Watson Chat: Location info collected:', locationInfo);
 
