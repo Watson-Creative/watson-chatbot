@@ -26,6 +26,14 @@
     console.log('Watson Chat: Enhancement scripts loading...');
     
     // ========================================
+    // GLOBAL CONFIGURATION
+    // ========================================
+    // Toggle the intake form functionality on/off
+    // true  = Show the custom intake form when chat opens
+    // false = Disable the form completely and use the standard chat interface
+    const FORM_ACTIVE = true; // Currently DISABLED - set to true to enable
+    
+    // ========================================
     // SCRIPT 1: Chat Bubble Popup Functionality
     // ========================================
     try {
@@ -411,12 +419,6 @@
     try {
         // Form-based initial interaction for Watson Creative chatbot
         (function() {
-            // ===== FORM CONFIGURATION =====
-            // Toggle the intake form functionality on/off
-            // true  = Show the custom intake form when chat opens
-            // false = Disable the form completely and use the standard chat interface
-            const FORM_ACTIVE = false; // Currently DISABLED - set to true to enable
-            
             let formSubmitted = false;
             let chatInitialized = false;
 
