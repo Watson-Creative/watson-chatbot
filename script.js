@@ -411,6 +411,12 @@
     try {
         // Form-based initial interaction for Watson Creative chatbot
         (function() {
+            // ===== FORM CONFIGURATION =====
+            // Toggle the intake form functionality on/off
+            // true  = Show the custom intake form when chat opens
+            // false = Disable the form completely and use the standard chat interface
+            const FORM_ACTIVE = false; // Currently DISABLED - set to true to enable
+            
             let formSubmitted = false;
             let chatInitialized = false;
 
@@ -627,6 +633,12 @@
 
             // Function to hide the message input area and show the form
             function showIntakeForm() {
+                // Check if form is active
+                if (!FORM_ACTIVE) {
+                    console.log('Watson Chat: Form is disabled via FORM_ACTIVE flag');
+                    return;
+                }
+                
                 // Find the chat container
                 const chatContainer = document.getElementById('anything-llm-chat');
                 if (!chatContainer || formSubmitted) return;
@@ -946,6 +958,13 @@
 
             // Initialize the form when chat opens
             function initializeFormInteraction() {
+                // Check if form is active
+                if (!FORM_ACTIVE) {
+                    console.log('Watson Chat: Form functionality is disabled');
+                    chatInitialized = true; // Mark as initialized to prevent repeated checks
+                    return;
+                }
+                
                 // Prevent duplicate initialization
                 if (chatInitialized) {
                     console.log('Watson Chat: Already initialized, skipping');
@@ -1319,8 +1338,18 @@
 
             // Expose functions for debugging
             window.watsonChatDebug = {
-                showForm: showIntakeForm,
+                showForm: () => {
+                    if (!FORM_ACTIVE) {
+                        console.log('Watson Chat: Form is disabled via FORM_ACTIVE flag');
+                        return;
+                    }
+                    showIntakeForm();
+                },
                 resetForm: () => {
+                    if (!FORM_ACTIVE) {
+                        console.log('Watson Chat: Form is disabled via FORM_ACTIVE flag');
+                        return;
+                    }
                     sessionStorage.removeItem('watson_form_submitted');
                     formSubmitted = false;
                     chatInitialized = false;
@@ -1342,6 +1371,7 @@
                     const originalForm = document.querySelector('#anything-llm-chat form:not(#watson-contact-form)');
                     
                     console.log('Watson Chat Status:', {
+                        formActive: FORM_ACTIVE,
                         formSubmitted,
                         chatInitialized,
                         sessionStorage: sessionStorage.getItem('watson_form_submitted'),
@@ -1353,7 +1383,8 @@
                         messageInputExists: !!document.getElementById('message-input'),
                         sendButtonExists: !!document.getElementById('send-message-button')
                     });
-                }
+                },
+                isFormActive: () => FORM_ACTIVE
             };
 
 
